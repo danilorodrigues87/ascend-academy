@@ -26,8 +26,6 @@ import { Route as AppAssessmentsRouteImport } from './routes/_app.assessments'
 import { Route as AppAiRouteImport } from './routes/_app.ai'
 import { Route as AppRoleplaySimulationIdRouteImport } from './routes/_app.roleplay.$simulationId'
 import { Route as AppCoursesCourseIdRouteImport } from './routes/_app.courses.$courseId'
-import { Route as AppRoleplayRouteImport } from './routes/_app.roleplay'
-import { Route as AppRoleplaySimulationIdRouteImport } from './routes/_app.roleplay.$simulationId'
 import { Route as AppCoursesCourseIdLessonsLessonIdRouteImport } from './routes/_app.courses.$courseId.lessons.$lessonId'
 
 const LoginRoute = LoginRouteImport.update({
