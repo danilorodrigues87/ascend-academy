@@ -212,6 +212,3 @@ function AIPage() {
   );
 }
 
-// use ScrollArea to silence unused if needed
-void ScrollArea;
-void Card;
