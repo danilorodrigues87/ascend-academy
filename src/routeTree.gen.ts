@@ -15,6 +15,7 @@ import { Route as FirstAccessRouteImport } from './routes/first-access'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
+import { Route as AppCoursesRouteImport } from './routes/_app.courses'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -45,12 +46,18 @@ const AppDashboardRoute = AppDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AppRoute,
 } as any)
+const AppCoursesRoute = AppCoursesRouteImport.update({
+  id: '/courses',
+  path: '/courses',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/first-access': typeof FirstAccessRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
+  '/courses': typeof AppCoursesRoute
   '/dashboard': typeof AppDashboardRoute
 }
 export interface FileRoutesByTo {
@@ -58,6 +65,7 @@ export interface FileRoutesByTo {
   '/first-access': typeof FirstAccessRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
+  '/courses': typeof AppCoursesRoute
   '/dashboard': typeof AppDashboardRoute
 }
 export interface FileRoutesById {
@@ -67,6 +75,7 @@ export interface FileRoutesById {
   '/first-access': typeof FirstAccessRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
+  '/_app/courses': typeof AppCoursesRoute
   '/_app/dashboard': typeof AppDashboardRoute
 }
 export interface FileRouteTypes {
@@ -76,9 +85,16 @@ export interface FileRouteTypes {
     | '/first-access'
     | '/forgot-password'
     | '/login'
+    | '/courses'
     | '/dashboard'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/first-access' | '/forgot-password' | '/login' | '/dashboard'
+  to:
+    | '/'
+    | '/first-access'
+    | '/forgot-password'
+    | '/login'
+    | '/courses'
+    | '/dashboard'
   id:
     | '__root__'
     | '/'
@@ -86,6 +102,7 @@ export interface FileRouteTypes {
     | '/first-access'
     | '/forgot-password'
     | '/login'
+    | '/_app/courses'
     | '/_app/dashboard'
   fileRoutesById: FileRoutesById
 }
@@ -141,14 +158,23 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppDashboardRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/courses': {
+      id: '/_app/courses'
+      path: '/courses'
+      fullPath: '/courses'
+      preLoaderRoute: typeof AppCoursesRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
 interface AppRouteChildren {
+  AppCoursesRoute: typeof AppCoursesRoute
   AppDashboardRoute: typeof AppDashboardRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppCoursesRoute: AppCoursesRoute,
   AppDashboardRoute: AppDashboardRoute,
 }
 
