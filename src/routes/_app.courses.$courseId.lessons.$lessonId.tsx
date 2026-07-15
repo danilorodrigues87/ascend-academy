@@ -10,11 +10,13 @@ import {
   ArrowLeft,
   ArrowRight,
   CheckCircle2,
+  ClipboardCheck,
   Download,
   ExternalLink,
   FileText,
   Link as LinkIcon,
   Lock,
+  MessageCircleMore,
   PlayCircle,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
@@ -165,40 +167,80 @@ function LessonPage() {
             <p className="mt-1 truncate font-medium">{course.title}</p>
           </div>
           <div className="max-h-[calc(100vh-14rem)] overflow-y-auto">
-            {course.modules.map((m) => (
-              <div key={m.id}>
-                <div className="border-b border-border/40 bg-muted/30 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Módulo {m.order} — {m.title}
+            {course.modules.map((m) => {
+              // Interleave activities every 3 lessons; alternate quiz / role play.
+              const items: Array<
+                | { kind: "lesson"; lesson: (typeof m.lessons)[number] }
+                | { kind: "activity"; activityKind: "quiz" | "roleplay"; index: number; unlocked: boolean }
+              > = [];
+              m.lessons.forEach((l, i) => {
+                items.push({ kind: "lesson", lesson: l });
+                if ((i + 1) % 3 === 0 && i < m.lessons.length - 1) {
+                  const activityKind = ((i + 1) / 3) % 2 === 0 ? "roleplay" : "quiz";
+                  const unlocked = m.lessons.slice(0, i + 1).every((x) => x.completed);
+                  items.push({ kind: "activity", activityKind, index: i, unlocked });
+                }
+              });
+              return (
+                <div key={m.id}>
+                  <div className="border-b border-border/40 bg-muted/30 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    Módulo {m.order} — {m.title}
+                  </div>
+                  <ul>
+                    {items.map((it, idx) => {
+                      if (it.kind === "lesson") {
+                        const l = it.lesson;
+                        const active = l.id === lesson.id;
+                        return (
+                          <li key={l.id}>
+                            <Link
+                              to="/courses/$courseId/lessons/$lessonId"
+                              params={{ courseId: course.id, lessonId: l.id }}
+                              aria-disabled={l.locked}
+                              className={`flex items-center gap-2 border-b border-border/30 px-4 py-2.5 text-sm transition-colors ${
+                                active ? "bg-primary/10 text-primary" : "hover:bg-accent/40"
+                              } ${l.locked ? "pointer-events-none opacity-60" : ""}`}
+                            >
+                              {l.locked ? (
+                                <Lock className="h-3.5 w-3.5 shrink-0" />
+                              ) : l.completed ? (
+                                <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-success" />
+                              ) : (
+                                <PlayCircle className="h-3.5 w-3.5 shrink-0" />
+                              )}
+                              <span className="flex-1 truncate">{l.title}</span>
+                              <span className="shrink-0 text-xs text-muted-foreground">{l.durationMinutes}m</span>
+                            </Link>
+                          </li>
+                        );
+                      }
+                      const isQuiz = it.activityKind === "quiz";
+                      return (
+                        <li key={`act_${m.id}_${idx}`}>
+                          <Link
+                            to={isQuiz ? "/assessments" : "/roleplay"}
+                            aria-disabled={!it.unlocked}
+                            className={`flex items-center gap-2 border-b border-border/30 bg-primary/[0.03] px-4 py-2.5 text-sm transition-colors ${
+                              it.unlocked ? "hover:bg-primary/10" : "pointer-events-none opacity-60"
+                            }`}
+                          >
+                            <span className={`grid h-6 w-6 shrink-0 place-items-center rounded-md ${isQuiz ? "bg-amber-500/15 text-amber-600 dark:text-amber-400" : "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"}`}>
+                              {isQuiz ? <ClipboardCheck className="h-3.5 w-3.5" /> : <MessageCircleMore className="h-3.5 w-3.5" />}
+                            </span>
+                            <span className="flex-1 truncate font-medium">
+                              {isQuiz ? "Atividade — Checkpoint" : "Simulação prática com IA"}
+                            </span>
+                            <span className="shrink-0 text-[10px] uppercase tracking-wider text-muted-foreground">
+                              {it.unlocked ? (isQuiz ? "Quiz" : "Role-play") : "Bloqueada"}
+                            </span>
+                          </Link>
+                        </li>
+                      );
+                    })}
+                  </ul>
                 </div>
-                <ul>
-                  {m.lessons.map((l) => {
-                    const active = l.id === lesson.id;
-                    return (
-                      <li key={l.id}>
-                        <Link
-                          to="/courses/$courseId/lessons/$lessonId"
-                          params={{ courseId: course.id, lessonId: l.id }}
-                          aria-disabled={l.locked}
-                          className={`flex items-center gap-2 border-b border-border/30 px-4 py-2.5 text-sm transition-colors ${
-                            active ? "bg-primary/10 text-primary" : "hover:bg-accent/40"
-                          } ${l.locked ? "pointer-events-none opacity-60" : ""}`}
-                        >
-                          {l.locked ? (
-                            <Lock className="h-3.5 w-3.5 shrink-0" />
-                          ) : l.completed ? (
-                            <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-success" />
-                          ) : (
-                            <PlayCircle className="h-3.5 w-3.5 shrink-0" />
-                          )}
-                          <span className="flex-1 truncate">{l.title}</span>
-                          <span className="shrink-0 text-xs text-muted-foreground">{l.durationMinutes}m</span>
-                        </Link>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </Card>
       </aside>
