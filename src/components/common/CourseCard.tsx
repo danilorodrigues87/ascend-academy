@@ -7,6 +7,13 @@ import { Clock, Layers, PlayCircle, Star } from "lucide-react";
 import type { Course } from "@/types";
 
 export function CourseCard({ course, variant = "default" }: { course: Course; variant?: "default" | "compact" }) {
+  const allLessons = course.modules.flatMap((m) => m.lessons);
+  const targetLesson =
+    allLessons.find((l) => l.id === course.lastAccessedLessonId) ??
+    allLessons.find((l) => !l.locked && !l.completed) ??
+    allLessons.find((l) => !l.locked) ??
+    allLessons[0];
+  const continueLabel = course.progressPercent > 0 ? "Continuar" : "Iniciar curso";
   return (
     <Card className="group relative overflow-hidden border-border/60 p-0 transition-all duration-300 hover:-translate-y-1 hover:shadow-elegant">
       <Link
