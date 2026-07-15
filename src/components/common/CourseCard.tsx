@@ -7,6 +7,13 @@ import { Clock, Layers, PlayCircle, Star } from "lucide-react";
 import type { Course } from "@/types";
 
 export function CourseCard({ course, variant = "default" }: { course: Course; variant?: "default" | "compact" }) {
+  const allLessons = course.modules.flatMap((m) => m.lessons);
+  const targetLesson =
+    allLessons.find((l) => l.id === course.lastAccessedLessonId) ??
+    allLessons.find((l) => !l.locked && !l.completed) ??
+    allLessons.find((l) => !l.locked) ??
+    allLessons[0];
+  const continueLabel = course.progressPercent > 0 ? "Continuar" : "Iniciar curso";
   return (
     <Card className="group relative overflow-hidden border-border/60 p-0 transition-all duration-300 hover:-translate-y-1 hover:shadow-elegant">
       <Link
@@ -58,9 +65,18 @@ export function CourseCard({ course, variant = "default" }: { course: Course; va
       </Link>
       <div className="flex gap-2 border-t border-border/60 bg-muted/30 p-3">
         <Button asChild size="sm" className="flex-1 gap-1">
-          <Link to="/courses/$courseId" params={{ courseId: course.id }}>
-            <PlayCircle className="h-4 w-4" /> Continuar
-          </Link>
+          {targetLesson ? (
+            <Link
+              to="/courses/$courseId/lessons/$lessonId"
+              params={{ courseId: course.id, lessonId: targetLesson.id }}
+            >
+              <PlayCircle className="h-4 w-4" /> {continueLabel}
+            </Link>
+          ) : (
+            <Link to="/courses/$courseId" params={{ courseId: course.id }}>
+              <PlayCircle className="h-4 w-4" /> {continueLabel}
+            </Link>
+          )}
         </Button>
         <Button asChild variant="outline" size="sm" className="flex-1">
           <Link to="/courses/$courseId" params={{ courseId: course.id }}>Ver detalhes</Link>
