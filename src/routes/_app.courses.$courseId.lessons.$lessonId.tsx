@@ -178,7 +178,7 @@ function LessonPage() {
                         <Link
                           to="/courses/$courseId/lessons/$lessonId"
                           params={{ courseId: course.id, lessonId: l.id }}
-                          disabled={l.locked}
+                          aria-disabled={l.locked}
                           className={`flex items-center gap-2 border-b border-border/30 px-4 py-2.5 text-sm transition-colors ${
                             active ? "bg-primary/10 text-primary" : "hover:bg-accent/40"
                           } ${l.locked ? "pointer-events-none opacity-60" : ""}`}
