@@ -287,6 +287,12 @@ function ChatScreen({
   const scrollRef = useRef<HTMLDivElement>(null);
   const messages = simulation.messages;
 
+  // Load scenarios list to render the "conversas" panel (WhatsApp-like).
+  const { data: allScenarios = [] } = useQuery({
+    queryKey: ["roleplay:scenarios"],
+    queryFn: () => rolePlayService.listScenarios(),
+  });
+
   useEffect(() => {
     scrollRef.current?.scrollTo({
       top: scrollRef.current.scrollHeight,
@@ -296,18 +302,13 @@ function ChatScreen({
 
   const send = useMutation({
     mutationFn: async (content: string) => {
-      // Optimistic user message
       const userMsg: RolePlayMessage = {
         id: `m_${Date.now()}`,
         role: "user",
         content,
         createdAt: new Date().toISOString(),
       };
-      const optimistic = {
-        ...simulation,
-        messages: [...simulation.messages, userMsg],
-      };
-      onUpdated(optimistic);
+      onUpdated({ ...simulation, messages: [...simulation.messages, userMsg] });
       setTyping(true);
       const aiMsg = await rolePlayService.sendMessage(simulation.id, content);
       return { userMsg, aiMsg };
@@ -320,7 +321,6 @@ function ChatScreen({
         ),
       });
       setTyping(false);
-      // Refetch full sim to stay consistent with mock store
       rolePlayService.getSimulation(simulation.id).then((s) => s && onUpdated(s));
     },
     onError: (e: Error) => {
@@ -343,71 +343,83 @@ function ChatScreen({
     send.mutate(value);
   };
 
+  // WhatsApp-style doodle wallpaper as a data URL (subtle).
+  const wallpaper =
+    "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'><g fill='none' stroke='%23000' stroke-opacity='0.05' stroke-width='1.2'><path d='M20 30 q10 -10 20 0 t20 0'/><circle cx='100' cy='40' r='8'/><path d='M30 90 l14 -8 l14 8 l-14 8 z'/><path d='M90 100 q10 -6 20 0'/><circle cx='60' cy='120' r='5'/></g></svg>\")";
+
   return (
-    <div className="grid h-[calc(100vh-4rem)] grid-cols-1 md:grid-cols-[280px_1fr]">
-      {/* Context sidebar */}
-      <aside className="hidden flex-col border-r border-border/60 bg-sidebar/50 md:flex">
-        <div className="border-b border-border/60 p-4">
+    <div className="grid h-[calc(100vh-4rem)] grid-cols-1 md:grid-cols-[360px_1fr] bg-[#f0f2f5] dark:bg-[#111b21]">
+      {/* Conversations panel */}
+      <aside className="hidden min-h-0 flex-col border-r border-black/10 bg-white dark:border-white/10 dark:bg-[#111b21] md:flex">
+        <div className="flex items-center justify-between border-b border-black/5 bg-[#f0f2f5] px-4 py-3 dark:border-white/5 dark:bg-[#202c33]">
           <Link
             to="/roleplay"
-            className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-foreground/80 hover:text-foreground"
           >
-            <ArrowLeft className="h-3 w-3" /> Sair da simulação
+            <ArrowLeft className="h-4 w-4" />
+            Simulações
           </Link>
-          <h2 className="mt-3 font-display text-base font-semibold leading-snug">
-            {scenario.title}
-          </h2>
-          <p className="mt-1 text-[11px] uppercase tracking-wider text-muted-foreground">
-            {scenario.moduleTitle}
-          </p>
+          <Badge variant="outline" className="gap-1 border-primary/30 bg-primary/5 text-[10px] text-primary">
+            <Sparkles className="h-2.5 w-2.5" /> IA
+          </Badge>
         </div>
-        <div className="flex-1 space-y-4 overflow-y-auto p-4 text-sm">
-          <div>
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-              Dificuldade
-            </p>
-            <p className="mt-0.5 flex items-center gap-1 font-medium">
-              <Flame className="h-3.5 w-3.5 text-primary" /> {difficultyLabel[difficulty]}
-            </p>
-          </div>
-          <div>
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-              Seu papel
-            </p>
-            <p className="mt-0.5">{scenario.userRole}</p>
-          </div>
-          <div>
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-              Objetivos
-            </p>
-            <ul className="mt-1 space-y-1.5 text-xs text-muted-foreground">
-              {scenario.objectives.map((o, i) => (
-                <li key={i} className="flex gap-1.5">
-                  <ChevronRight className="mt-0.5 h-3 w-3 shrink-0 text-primary" />
-                  <span>{o}</span>
-                </li>
-              ))}
-            </ul>
+        <div className="border-b border-black/5 px-3 py-2 dark:border-white/5">
+          <div className="flex items-center gap-2 rounded-lg bg-[#f0f2f5] px-3 py-1.5 text-xs text-muted-foreground dark:bg-[#202c33]">
+            <MessageCircle className="h-3.5 w-3.5" />
+            <span>Pesquisar simulações</span>
           </div>
         </div>
-        <div className="border-t border-border/60 p-3">
+        <div className="min-h-0 flex-1 overflow-y-auto">
+          {allScenarios.map((s) => {
+            const active = s.id === scenario.id;
+            return (
+              <Link
+                key={s.id}
+                to="/roleplay/$simulationId"
+                params={{ simulationId: s.id }}
+                className={`flex items-start gap-3 border-b border-black/[0.04] px-4 py-3 transition-colors dark:border-white/[0.04] ${
+                  active
+                    ? "bg-[#f0f2f5] dark:bg-[#2a3942]"
+                    : "hover:bg-black/[0.02] dark:hover:bg-white/[0.02]"
+                }`}
+              >
+                <Avatar className="h-11 w-11 shrink-0">
+                  <AvatarImage src={s.aiCharacterAvatarUrl} alt={s.aiCharacterName} />
+                  <AvatarFallback>{initials(s.aiCharacterName)}</AvatarFallback>
+                </Avatar>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="truncate text-sm font-semibold">{s.aiCharacterName}</p>
+                    <span className="shrink-0 text-[10px] text-muted-foreground">
+                      {difficultyLabel[s.difficulty]}
+                    </span>
+                  </div>
+                  <p className="truncate text-xs text-muted-foreground">{s.title}</p>
+                  <p className="mt-0.5 truncate text-[11px] text-muted-foreground/80">
+                    {s.courseTitle}
+                  </p>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+        <div className="border-t border-black/5 p-3 dark:border-white/5">
           <Button
             onClick={() => finish.mutate()}
             disabled={finish.isPending}
-            variant="default"
             className="w-full gap-2"
           >
             <Trophy className="h-4 w-4" />
-            {finish.isPending ? "Avaliando..." : "Finalizar Simulação"}
+            {finish.isPending ? "Avaliando..." : "Finalizar simulação"}
           </Button>
         </div>
       </aside>
 
-      {/* Conversation */}
-      <section className="flex min-w-0 flex-col bg-[radial-gradient(circle_at_top_right,hsl(var(--primary)/0.08),transparent_60%)]">
-        {/* Header — WhatsApp-like but branded */}
-        <header className="flex items-center gap-3 border-b border-border/60 bg-card/70 px-4 py-3 backdrop-blur md:px-6">
-          <Avatar className="h-10 w-10 ring-2 ring-primary/30">
+      {/* Chat */}
+      <section className="flex min-h-0 min-w-0 flex-col">
+        {/* Header — WhatsApp green */}
+        <header className="flex items-center gap-3 border-b border-black/10 bg-[#f0f2f5] px-4 py-2.5 dark:border-white/5 dark:bg-[#202c33]">
+          <Avatar className="h-10 w-10">
             <AvatarImage src={scenario.aiCharacterAvatarUrl} alt={scenario.aiCharacterName} />
             <AvatarFallback>{initials(scenario.aiCharacterName)}</AvatarFallback>
           </Avatar>
@@ -415,11 +427,7 @@ function ChatScreen({
             <p className="truncate font-semibold leading-tight">{scenario.aiCharacterName}</p>
             <p className="truncate text-xs text-muted-foreground">
               {typing ? (
-                <span className="inline-flex items-center gap-1 text-primary">
-                  <span className="relative flex h-1.5 w-1.5">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
-                    <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-primary" />
-                  </span>
+                <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
                   digitando...
                 </span>
               ) : (
@@ -427,33 +435,61 @@ function ChatScreen({
               )}
             </p>
           </div>
+          <Badge variant="outline" className="hidden gap-1 border-primary/30 bg-primary/5 text-[10px] text-primary sm:inline-flex">
+            <Flame className="h-3 w-3" /> {difficultyLabel[difficulty]}
+          </Badge>
           <Button
             onClick={() => finish.mutate()}
             disabled={finish.isPending}
             size="sm"
-            className="hidden gap-1.5 md:inline-flex"
+            className="gap-1.5"
           >
-            <Trophy className="h-4 w-4" /> Finalizar
+            <Trophy className="h-4 w-4" />
+            <span className="hidden sm:inline">Finalizar</span>
           </Button>
         </header>
 
         {/* Messages */}
-        <div ref={scrollRef} className="flex-1 overflow-y-auto px-3 py-6 md:px-8">
-          <div className="mx-auto flex max-w-2xl flex-col gap-3">
-            {messages.map((m) => (
-              <MessageBubble key={m.id} message={m} aiName={scenario.aiCharacterName} userName={user?.name} />
-            ))}
+        <div
+          ref={scrollRef}
+          className="min-h-0 flex-1 overflow-y-auto bg-[#efeae2] px-3 py-4 md:px-16 md:py-6 dark:bg-[#0b141a]"
+          style={{ backgroundImage: wallpaper, backgroundRepeat: "repeat" }}
+        >
+          {/* Date pill */}
+          <div className="mb-4 flex justify-center">
+            <span className="rounded-md bg-white/70 px-3 py-1 text-[11px] font-medium text-muted-foreground shadow-sm backdrop-blur dark:bg-[#182229]/80">
+              Hoje
+            </span>
+          </div>
+          {/* Scenario intro pill */}
+          <div className="mb-4 flex justify-center">
+            <div className="max-w-md rounded-lg bg-[#fff3c4] px-4 py-2 text-center text-[11px] leading-relaxed text-[#5a4a1a] shadow-sm dark:bg-[#182229] dark:text-amber-200/80">
+              <Lightbulb className="mr-1 inline h-3 w-3" />
+              Simulação: você é <strong>{scenario.userRole}</strong>. A IA está no papel de <strong>{scenario.aiRole}</strong>.
+            </div>
+          </div>
+
+          <div className="mx-auto flex max-w-3xl flex-col gap-1">
+            {messages.map((m, i) => {
+              const prev = messages[i - 1];
+              const grouped = prev && prev.role === m.role;
+              return (
+                <MessageBubble
+                  key={m.id}
+                  message={m}
+                  aiName={scenario.aiCharacterName}
+                  userName={user?.name}
+                  grouped={grouped}
+                />
+              );
+            })}
             {typing && (
-              <div className="flex items-end gap-2">
-                <Avatar className="h-7 w-7">
-                  <AvatarImage src={scenario.aiCharacterAvatarUrl} />
-                  <AvatarFallback>{initials(scenario.aiCharacterName)}</AvatarFallback>
-                </Avatar>
-                <div className="rounded-2xl rounded-bl-sm bg-card px-4 py-3 shadow-soft">
+              <div className="mt-1 flex items-end gap-2">
+                <div className="relative rounded-lg rounded-bl-none bg-white px-4 py-2.5 shadow-sm dark:bg-[#202c33]">
                   <div className="flex gap-1">
-                    <span className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground/60" />
-                    <span className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground/60" style={{ animationDelay: "0.15s" }} />
-                    <span className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground/60" style={{ animationDelay: "0.3s" }} />
+                    <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-muted-foreground/60" />
+                    <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-muted-foreground/60" style={{ animationDelay: "0.15s" }} />
+                    <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-muted-foreground/60" style={{ animationDelay: "0.3s" }} />
                   </div>
                 </div>
               </div>
@@ -464,9 +500,9 @@ function ChatScreen({
         {/* Composer */}
         <form
           onSubmit={handleSubmit}
-          className="border-t border-border/60 bg-background/80 p-3 backdrop-blur md:p-4"
+          className="flex items-end gap-2 border-t border-black/10 bg-[#f0f2f5] px-3 py-2.5 dark:border-white/5 dark:bg-[#202c33] md:px-6"
         >
-          <div className="mx-auto flex max-w-2xl items-end gap-2 rounded-2xl border border-border/60 bg-card p-2 shadow-soft focus-within:border-primary/50 focus-within:shadow-elegant">
+          <div className="flex flex-1 items-end rounded-lg bg-white px-3 py-1 shadow-sm dark:bg-[#2a3942]">
             <Textarea
               autoFocus
               value={input}
@@ -477,31 +513,20 @@ function ChatScreen({
                   handleSubmit(e);
                 }
               }}
-              placeholder={`Responder como ${scenario.userRole}...`}
-              className="min-h-[44px] max-h-40 resize-none border-0 focus-visible:ring-0"
+              placeholder={`Digite uma mensagem como ${scenario.userRole}...`}
+              className="min-h-[40px] max-h-40 resize-none border-0 bg-transparent px-1 py-2 focus-visible:ring-0"
               disabled={finish.isPending}
             />
-            <Button
-              type="submit"
-              size="icon"
-              className="shrink-0"
-              disabled={!input.trim() || send.isPending || finish.isPending}
-              aria-label="Enviar"
-            >
-              <Send className="h-4 w-4" />
-            </Button>
           </div>
-          <div className="mx-auto mt-2 flex max-w-2xl items-center justify-between text-[10px] text-muted-foreground">
-            <span>Enter para enviar · Shift+Enter para nova linha</span>
-            <button
-              type="button"
-              onClick={() => finish.mutate()}
-              disabled={finish.isPending}
-              className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-primary hover:bg-primary/10 md:hidden"
-            >
-              <Trophy className="h-3 w-3" /> Finalizar
-            </button>
-          </div>
+          <Button
+            type="submit"
+            size="icon"
+            className="h-10 w-10 shrink-0 rounded-full bg-[#00a884] text-white hover:bg-[#008f72] dark:bg-[#00a884]"
+            disabled={!input.trim() || send.isPending || finish.isPending}
+            aria-label="Enviar"
+          >
+            <Send className="h-4 w-4" />
+          </Button>
         </form>
       </section>
     </div>
@@ -512,46 +537,71 @@ function MessageBubble({
   message,
   aiName,
   userName,
+  grouped,
 }: {
   message: RolePlayMessage;
   aiName: string;
   userName?: string;
+  grouped?: boolean;
 }) {
   const isUser = message.role === "user";
   const time = new Date(message.createdAt).toLocaleTimeString("pt-BR", {
     hour: "2-digit",
     minute: "2-digit",
   });
+  const label = isUser ? userName ?? "Você" : aiName;
 
   return (
-    <div className={`flex items-end gap-2 ${isUser ? "flex-row-reverse" : ""}`}>
-      <Avatar className="h-7 w-7">
-        <AvatarFallback className={isUser ? "bg-primary text-primary-foreground text-[10px]" : "text-[10px]"}>
-          {isUser ? initials(userName ?? "Você") : initials(aiName)}
-        </AvatarFallback>
-      </Avatar>
+    <div
+      className={`flex ${isUser ? "justify-end" : "justify-start"} ${grouped ? "mt-0.5" : "mt-2"}`}
+    >
       <div
-        className={`max-w-[78%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed shadow-soft ${
-          isUser
-            ? "gradient-primary rounded-br-sm text-primary-foreground"
-            : "rounded-bl-sm bg-card text-foreground"
-        }`}
         data-message-id={message.id}
+        className={`relative max-w-[78%] px-3 py-1.5 text-sm leading-relaxed shadow-sm ${
+          isUser
+            ? "rounded-lg rounded-br-none bg-[#d9fdd3] text-[#111b21] dark:bg-[#005c4b] dark:text-white"
+            : "rounded-lg rounded-bl-none bg-white text-[#111b21] dark:bg-[#202c33] dark:text-white"
+        }`}
       >
+        {!grouped && (
+          <p
+            className={`mb-0.5 text-[11px] font-semibold ${
+              isUser ? "text-emerald-800/80 dark:text-emerald-200/90" : "text-primary"
+            }`}
+          >
+            {label}
+          </p>
+        )}
         {message.content.split("\n").map((line, i) => (
-          <p key={i} className={i > 0 ? "mt-1.5" : ""}>{line}</p>
+          <p key={i} className={i > 0 ? "mt-1" : ""}>
+            {line}
+          </p>
         ))}
         <span
-          className={`mt-1 block text-right text-[10px] ${
-            isUser ? "text-primary-foreground/70" : "text-muted-foreground"
+          className={`float-right ml-2 mt-1 inline-flex items-center gap-0.5 text-[10px] ${
+            isUser ? "text-emerald-900/60 dark:text-emerald-100/70" : "text-muted-foreground"
           }`}
         >
           {time}
+          {isUser && (
+            <svg viewBox="0 0 16 11" width="14" height="11" className="ml-0.5" aria-hidden>
+              <path
+                fill="currentColor"
+                d="M11.071.653a.457.457 0 0 0-.304-.102.436.436 0 0 0-.311.15L4.85 7.256 2.081 4.463a.454.454 0 0 0-.317-.135.446.446 0 0 0-.32.13l-.94.941a.45.45 0 0 0-.13.318c0 .12.048.235.13.318L4.61 10.157a.454.454 0 0 0 .318.13.446.446 0 0 0 .32-.135L14.55 1.834a.457.457 0 0 0 0-.647z"
+              />
+              <path
+                fill="currentColor"
+                d="M15.396.653a.457.457 0 0 0-.303-.102.436.436 0 0 0-.311.15L9.176 7.256 8.5 6.582l-.94.94a.451.451 0 0 0 0 .64l1.28 1.294a.454.454 0 0 0 .318.13.446.446 0 0 0 .32-.135l9.301-9.318a.457.457 0 0 0 0-.647z"
+              />
+            </svg>
+          )}
         </span>
+        <div className="clear-both" />
       </div>
     </div>
   );
 }
+
 
 /* ----------------------------- Evaluation ----------------------------- */
 
