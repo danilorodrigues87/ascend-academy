@@ -74,6 +74,3 @@ function ContinuePage() {
     </div>
   );
 }
-
-// unused: silence lint for redirect import in case adjusted later
-void redirect;
