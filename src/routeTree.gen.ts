@@ -15,6 +15,7 @@ import { Route as FirstAccessRouteImport } from './routes/first-access'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppSettingsRouteImport } from './routes/_app.settings'
+import { Route as AppRoleplayRouteImport } from './routes/_app.roleplay'
 import { Route as AppProfileRouteImport } from './routes/_app.profile'
 import { Route as AppNotificationsRouteImport } from './routes/_app.notifications'
 import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
@@ -53,6 +54,11 @@ const IndexRoute = IndexRouteImport.update({
 const AppSettingsRoute = AppSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppRoleplayRoute = AppRoleplayRouteImport.update({
+  id: '/roleplay',
+  path: '/roleplay',
   getParentRoute: () => AppRoute,
 } as any)
 const AppProfileRoute = AppProfileRouteImport.update({
@@ -120,6 +126,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AppDashboardRoute
   '/notifications': typeof AppNotificationsRoute
   '/profile': typeof AppProfileRoute
+  '/roleplay': typeof AppRoleplayRoute
   '/settings': typeof AppSettingsRoute
   '/courses/$courseId': typeof AppCoursesCourseIdRouteWithChildren
   '/courses/$courseId/lessons/$lessonId': typeof AppCoursesCourseIdLessonsLessonIdRoute
@@ -137,6 +144,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AppDashboardRoute
   '/notifications': typeof AppNotificationsRoute
   '/profile': typeof AppProfileRoute
+  '/roleplay': typeof AppRoleplayRoute
   '/settings': typeof AppSettingsRoute
   '/courses/$courseId': typeof AppCoursesCourseIdRouteWithChildren
   '/courses/$courseId/lessons/$lessonId': typeof AppCoursesCourseIdLessonsLessonIdRoute
@@ -156,6 +164,7 @@ export interface FileRoutesById {
   '/_app/dashboard': typeof AppDashboardRoute
   '/_app/notifications': typeof AppNotificationsRoute
   '/_app/profile': typeof AppProfileRoute
+  '/_app/roleplay': typeof AppRoleplayRoute
   '/_app/settings': typeof AppSettingsRoute
   '/_app/courses/$courseId': typeof AppCoursesCourseIdRouteWithChildren
   '/_app/courses/$courseId/lessons/$lessonId': typeof AppCoursesCourseIdLessonsLessonIdRoute
@@ -175,6 +184,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/notifications'
     | '/profile'
+    | '/roleplay'
     | '/settings'
     | '/courses/$courseId'
     | '/courses/$courseId/lessons/$lessonId'
@@ -192,6 +202,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/notifications'
     | '/profile'
+    | '/roleplay'
     | '/settings'
     | '/courses/$courseId'
     | '/courses/$courseId/lessons/$lessonId'
@@ -210,6 +221,7 @@ export interface FileRouteTypes {
     | '/_app/dashboard'
     | '/_app/notifications'
     | '/_app/profile'
+    | '/_app/roleplay'
     | '/_app/settings'
     | '/_app/courses/$courseId'
     | '/_app/courses/$courseId/lessons/$lessonId'
@@ -265,6 +277,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof AppSettingsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/roleplay': {
+      id: '/_app/roleplay'
+      path: '/roleplay'
+      fullPath: '/roleplay'
+      preLoaderRoute: typeof AppRoleplayRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/profile': {
@@ -373,6 +392,7 @@ interface AppRouteChildren {
   AppDashboardRoute: typeof AppDashboardRoute
   AppNotificationsRoute: typeof AppNotificationsRoute
   AppProfileRoute: typeof AppProfileRoute
+  AppRoleplayRoute: typeof AppRoleplayRoute
   AppSettingsRoute: typeof AppSettingsRoute
 }
 
@@ -385,6 +405,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppDashboardRoute: AppDashboardRoute,
   AppNotificationsRoute: AppNotificationsRoute,
   AppProfileRoute: AppProfileRoute,
+  AppRoleplayRoute: AppRoleplayRoute,
   AppSettingsRoute: AppSettingsRoute,
 }
 
