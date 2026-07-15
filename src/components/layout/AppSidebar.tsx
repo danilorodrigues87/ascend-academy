@@ -10,6 +10,7 @@ import {
   Settings,
   LogOut,
   Bell,
+  MessagesSquare,
 } from "lucide-react";
 import {
   Sidebar,
