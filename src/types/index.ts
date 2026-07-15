@@ -154,6 +154,94 @@ export interface AssessmentResult {
   submittedAt: string;
 }
 
+// ---------------- Role Play Simulations ----------------
+
+export type RolePlayDifficulty = "easy" | "medium" | "hard" | "expert";
+export type RolePlayStatus = "pending" | "in_progress" | "approved" | "retry";
+
+export interface RolePlayCriterion {
+  key: string;
+  label: string;
+  description?: string;
+}
+
+export interface RolePlayScenario {
+  id: string;
+  courseId: string;
+  courseTitle: string;
+  moduleTitle: string;
+  title: string;
+  theme: string;
+  scenario: string;
+  userRole: string;
+  aiRole: string;
+  aiCharacterName: string;
+  aiCharacterAvatarUrl?: string;
+  objectives: string[];
+  criteria: RolePlayCriterion[];
+  difficulty: RolePlayDifficulty;
+  minScore: number;
+  basePrompt: string;
+  initialPersonality: string;
+  initialMessage: string;
+  estimatedMinutes: number;
+}
+
+export interface RolePlayMessage {
+  id: string;
+  role: "user" | "ai";
+  content: string;
+  createdAt: string;
+  typing?: boolean;
+}
+
+export interface RolePlayTimelineEvent {
+  id: string;
+  messageId: string;
+  type: "success" | "error" | "opportunity" | "decision";
+  title: string;
+  detail: string;
+}
+
+export interface RolePlayCompetencyScore {
+  key: string;
+  label: string;
+  score: number;
+  comment?: string;
+}
+
+export interface RolePlayEvaluation {
+  simulationId: string;
+  overallScore: number;
+  passed: boolean;
+  summary: string;
+  strengths: string[];
+  improvements: string[];
+  mistakes: string[];
+  reviewTopics: string[];
+  competencies: RolePlayCompetencyScore[];
+  timeline: RolePlayTimelineEvent[];
+  referenceConversation: RolePlayMessage[];
+}
+
+export interface RolePlaySimulation {
+  id: string;
+  scenarioId: string;
+  scenarioTitle: string;
+  courseId: string;
+  courseTitle: string;
+  moduleTitle: string;
+  theme: string;
+  difficulty: RolePlayDifficulty;
+  startedAt: string;
+  endedAt?: string;
+  durationSeconds: number;
+  messages: RolePlayMessage[];
+  status: RolePlayStatus;
+  score?: number;
+  evaluation?: RolePlayEvaluation;
+}
+
 export interface ChatMessage {
   id: string;
   role: "user" | "assistant" | "system";

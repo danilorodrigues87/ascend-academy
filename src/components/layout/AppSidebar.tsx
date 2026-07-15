@@ -10,6 +10,7 @@ import {
   Settings,
   LogOut,
   Bell,
+  MessagesSquare,
 } from "lucide-react";
 import {
   Sidebar,
@@ -35,6 +36,7 @@ const nav = [
   { title: "Meus Cursos", url: "/courses", icon: BookOpen },
   { title: "Continuar estudando", url: "/continue", icon: PlayCircle },
   { title: "Avaliações", url: "/assessments", icon: ClipboardCheck },
+  { title: "Simulações IA", url: "/roleplay", icon: MessagesSquare },
   { title: "IA Pedagógica", url: "/ai", icon: Sparkles },
   { title: "Certificados", url: "/certificates", icon: Award },
   { title: "Notificações", url: "/notifications", icon: Bell },
