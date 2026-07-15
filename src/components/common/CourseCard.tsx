@@ -65,9 +65,18 @@ export function CourseCard({ course, variant = "default" }: { course: Course; va
       </Link>
       <div className="flex gap-2 border-t border-border/60 bg-muted/30 p-3">
         <Button asChild size="sm" className="flex-1 gap-1">
-          <Link to="/courses/$courseId" params={{ courseId: course.id }}>
-            <PlayCircle className="h-4 w-4" /> Continuar
-          </Link>
+          {targetLesson ? (
+            <Link
+              to="/courses/$courseId/lessons/$lessonId"
+              params={{ courseId: course.id, lessonId: targetLesson.id }}
+            >
+              <PlayCircle className="h-4 w-4" /> {continueLabel}
+            </Link>
+          ) : (
+            <Link to="/courses/$courseId" params={{ courseId: course.id }}>
+              <PlayCircle className="h-4 w-4" /> {continueLabel}
+            </Link>
+          )}
         </Button>
         <Button asChild variant="outline" size="sm" className="flex-1">
           <Link to="/courses/$courseId" params={{ courseId: course.id }}>Ver detalhes</Link>
