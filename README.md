@@ -244,12 +244,55 @@ tokens semânticos (`text-foreground`, `bg-background`, `bg-primary`).
 ## 📦 Build de produção
 
 ```bash
-bun run build       # gera dist/
-bun run start       # serve dist/
+npm run build       # gera dist/client/ (SPA estático)
+npm run preview     # pré-visualiza o build
 ```
 
-O build produz um app SSR/SSG pronto para deploy em qualquer edge runtime
-(Cloudflare Workers, Vercel, Netlify) ou Node tradicional.
+Com `spa: true` + `nitro: false` no `vite.config.ts`, o build produz um **site estático**
+pronto para Apache compartilhado (HostGator): `dist/client/index.html` + `assets/` + `brand/` + `.htaccess`.
+
+### Deploy no HostGator (subdomínio do aluno)
+
+**Causa típica de 403:** pasta do site sem `index.html` (só `assets/`) ou permissões erradas.  
+**Causa típica de 404 em `/login`:** Apache sem rewrite para `index.html` (falta `.htaccess`).
+
+1. No `.env` de produção (antes do build), use URL **absoluta** da API do painel:
+
+```env
+VITE_API_BASE_URL=https://SEU-DOMINIO-DO-PAINEL/api/v1/student
+```
+
+(ex.: `https://painel.ctieducacional.com.br/api/v1/student` — ajuste ao path real)
+
+2. Build local:
+
+```bash
+npm run build
+```
+
+3. No File Manager / FTP do subdomínio (`aluno.ctieducacional.com.br`):
+   - **Apague** o conteúdo antigo da pasta do site (não deixe `src/`, `node_modules`, `package.json` na raiz pública)
+   - Envie **só** o conteúdo de `dist/client/`:
+     - `index.html`
+     - `.htaccess`
+     - `assets/`
+     - `brand/`
+   - Pastas `755`, arquivos `644`
+
+4. No painel-cti (`.env`), libere CORS:
+
+```env
+STUDENT_CORS_ORIGINS=https://aluno.ctieducacional.com.br
+```
+
+5. Teste: `https://aluno…/` deve abrir (ou redirecionar ao login); `/login` não pode dar 404 do Apache.
+
+Se usar **Git Deploy** do cPanel (`.cpanel.yml`), o script copia `dist/client/` para
+`/home1/dncurs82/aluno.ctieducacional.com.br` — é preciso que `dist/client` já exista no push
+(build local + commit, ou outro CI).
+
+> ⚠️ Não copie o repositório inteiro para a pasta pública. Não misture dump de `.output/public`
+> na raiz do projeto Git (isso quebrava o build e deixava o site sem `index.html`).
 
 ---
 

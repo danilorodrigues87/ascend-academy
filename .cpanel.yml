@@ -1,5 +1,20 @@
 ---
+# Deploy Git do cPanel → pasta do subdomínio do portal.
+#
+# ANTES do push/deploy no cPanel:
+#   1. Defina VITE_API_BASE_URL no .env (URL absoluta da API do painel)
+#   2. Rode localmente: npm run build
+#   3. Commit/push de dist/client (ou faça upload manual via FTP)
+#
+# A pasta do site NÃO deve ser o repositório inteiro (src/, node_modules…).
+# Só o conteúdo de dist/client: index.html + .htaccess + assets/ + brand/
+
 deployment:
   tasks:
-    - export DEPLOYPATH=/home1/dncurs82/aluno.ctieducacional.com.br/
-    - /bin/cp -R .output/public/* $DEPLOYPATH
+    - export DEPLOYPATH=/home1/dncurs82/aluno.ctieducacional.com.br
+    - /bin/mkdir -p $DEPLOYPATH
+    - /bin/rm -rf $DEPLOYPATH/assets $DEPLOYPATH/brand
+    - /bin/cp -R dist/client/. $DEPLOYPATH/
+    - /bin/chmod 644 $DEPLOYPATH/index.html $DEPLOYPATH/.htaccess 2>/dev/null || true
+    - /bin/find $DEPLOYPATH/assets $DEPLOYPATH/brand -type f -exec chmod 644 {} \; 2>/dev/null || true
+    - /bin/find $DEPLOYPATH/assets $DEPLOYPATH/brand -type d -exec chmod 755 {} \; 2>/dev/null || true

@@ -1,8 +1,16 @@
+# Fallback SPA na raiz do repositório (útil se alguém copiar o repo inteiro por engano).
+# O deploy correto usa só o conteúdo de .output/public (já inclui public/.htaccess).
+
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteBase /
-  RewriteRule ^index\.html$ - [L]
-  RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteRule . /index.html [L]
+
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  RewriteRule ^ index.html [L]
 </IfModule>
+
+Options -Indexes
+DirectoryIndex index.html

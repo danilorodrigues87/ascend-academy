@@ -9,11 +9,19 @@ import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 const painelTarget = process.env.VITE_PAINEL_PROXY_TARGET || "http://localhost/pjt/painel-cti";
 
 export default defineConfig({
+  // HostGator compartilhado = Apache estático (sem Node).
+  // SPA mode gera shell HTML; nitro desligado evita preset Cloudflare/SSR no shared host.
   tanstackStart: {
-    // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
-    // nitro/vite builds from this
     server: { entry: "server" },
+    spa: {
+      enabled: true,
+      prerender: {
+        outputPath: "/index.html",
+        crawlLinks: false,
+      },
+    },
   },
+  nitro: false,
   vite: {
     server: {
       host: "127.0.0.1",

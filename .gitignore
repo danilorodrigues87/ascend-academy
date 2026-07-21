@@ -16,6 +16,10 @@ dist-ssr
 .nitro
 *.local
 
+# Nunca versionar dump do build na raiz do repo (quebra o Nitro)
+/assets
+/brand
+
 # Wrangler / Cloudflare
 .wrangler/
 .dev.vars
