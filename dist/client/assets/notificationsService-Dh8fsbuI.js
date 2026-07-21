@@ -1,0 +1,1 @@
+import{n as e,r as t,t as n}from"./http-DU59ol9V.js";import{o as r,r as i}from"./data-Bz8D1pSc.js";var a={async list(){return await e(250),structuredClone(r)},async markAllRead(){await e(150),r.forEach(e=>e.read=!0)}},o={async list(){return n?t.get(`/certificates`):(await e(300),structuredClone(i))}};export{a as n,o as t};
