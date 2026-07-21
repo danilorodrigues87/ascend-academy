@@ -24,7 +24,8 @@ function getStoredToken(): string | null {
 async function request<T>(path: string, options: HttpOptions = {}): Promise<T> {
   const { token, headers, ...rest } = options;
   const bearer = token === null ? null : token ?? getStoredToken();
-  const res = await fetch(`${BASE_URL}${path.startsWith("/") ? path : `/${path}`}`, {
+  const url = `${BASE_URL}${path.startsWith("/") ? path : `/${path}`}`;
+  const res = await fetch(url, {
     ...rest,
     headers: {
       "Content-Type": "application/json",
@@ -32,18 +33,34 @@ async function request<T>(path: string, options: HttpOptions = {}): Promise<T> {
       ...headers,
     },
   });
-  if (!res.ok) {
-    let message = res.statusText;
+
+  const contentType = res.headers.get("content-type") || "";
+  const raw = await res.text();
+
+  // Resposta HTML = URL da API errada (ex.: build com /api relativo no subdomínio do portal)
+  if (raw.trimStart().startsWith("<!") || contentType.includes("text/html")) {
+    throw new Error(
+      "A API respondeu HTML em vez de JSON. Confira VITE_API_BASE_URL no build " +
+        `(agora: ${BASE_URL}) e STUDENT_CORS_ORIGINS no painel. URL: ${url}`,
+    );
+  }
+
+  let body: unknown = undefined;
+  if (raw) {
     try {
-      const body = (await res.json()) as { message?: string; erro?: string };
-      message = body?.message || body?.erro || message;
+      body = JSON.parse(raw);
     } catch {
-      /* ignore */
+      throw new Error(`Resposta inválida da API (${res.status}). URL: ${url}`);
     }
-    throw new Error(message || `HTTP ${res.status}`);
+  }
+
+  if (!res.ok) {
+    const errBody = body as { message?: string; erro?: string } | undefined;
+    const message = errBody?.message || errBody?.erro || res.statusText || `HTTP ${res.status}`;
+    throw new Error(message);
   }
   if (res.status === 204) return undefined as T;
-  return res.json() as Promise<T>;
+  return body as T;
 }
 
 export const http = {
