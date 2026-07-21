@@ -7,39 +7,52 @@ import { Button } from "@/components/ui/button";
 import { Link } from "@tanstack/react-router";
 import { PlayCircle } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
+import { continueLabel, resolveContinueLesson } from "@/utils/continueLesson";
 
 export const Route = createFileRoute("/_app/continue")({
   component: ContinuePage,
+  head: () => ({ meta: [{ title: "Continuar estudando — CTI Educacional" }] }),
 });
 
 function ContinuePage() {
-  const { data: courses = [], isLoading } = useQuery({
+  const { data: courses = [], isLoading, isError } = useQuery({
     queryKey: ["courses"],
     queryFn: () => coursesService.list(),
   });
 
-  const inProgress = courses.filter((c) => c.progressPercent > 0 && c.progressPercent < 100);
+  const list = courses.filter((c) => c.enrolled && c.progressPercent < 100);
 
   return (
     <div className="mx-auto max-w-5xl space-y-6 p-4 md:p-8">
       <header>
         <h1 className="font-display text-4xl font-semibold">Continuar estudando</h1>
-        <p className="mt-1 text-muted-foreground">Retome exatamente de onde parou.</p>
+        <p className="mt-1 text-muted-foreground">Retome ou comece seus cursos matriculados.</p>
       </header>
 
       <div className="space-y-4">
         {isLoading ? (
           Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-32 rounded-xl" />)
-        ) : inProgress.length === 0 ? (
-          <Card className="p-10 text-center text-muted-foreground">Nenhum curso em andamento. Que tal começar um novo?</Card>
+        ) : isError ? (
+          <Card className="p-10 text-center text-muted-foreground">Não foi possível carregar os cursos. Tente novamente.</Card>
+        ) : list.length === 0 ? (
+          <Card className="p-10 text-center text-muted-foreground">
+            Nenhum curso disponível. Confira se há matrícula ativa e curso publicado.
+          </Card>
         ) : (
-          inProgress.map((c) => {
-            const lessonId =
-              c.lastAccessedLessonId ??
-              c.modules.flatMap((m) => m.lessons).find((l) => !l.locked && !l.completed)?.id;
+          list.map((c) => {
+            const lesson = resolveContinueLesson(c);
+            const label = continueLabel(c);
             return (
               <Card key={c.id} className="flex flex-col gap-4 overflow-hidden p-0 md:flex-row">
-                <img src={c.coverUrl} alt="" className="h-40 w-full object-cover md:h-auto md:w-64" />
+                {c.coverUrl ? (
+                  <img src={c.coverUrl} alt="" className="h-40 w-full object-cover md:h-auto md:w-64" />
+                ) : (
+                  <div className="flex h-40 w-full items-center justify-center bg-gradient-to-br from-primary/70 to-muted md:h-auto md:w-64">
+                    <span className="font-display text-4xl text-primary-foreground/90">
+                      {c.title.charAt(0)}
+                    </span>
+                  </div>
+                )}
                 <div className="flex flex-1 flex-col gap-3 p-5">
                   <div>
                     <p className="text-xs uppercase tracking-wider text-muted-foreground">{c.categories[0]}</p>
@@ -54,10 +67,10 @@ function ContinuePage() {
                     <Progress value={c.progressPercent} className="mt-1 h-2" />
                   </div>
                   <div className="mt-auto flex gap-2">
-                    {lessonId && (
+                    {lesson && (
                       <Button asChild className="gap-1">
-                        <Link to="/courses/$courseId/lessons/$lessonId" params={{ courseId: c.id, lessonId }}>
-                          <PlayCircle className="h-4 w-4" /> Continuar
+                        <Link to="/courses/$courseId/lessons/$lessonId" params={{ courseId: c.id, lessonId: lesson.id }}>
+                          <PlayCircle className="h-4 w-4" /> {label}
                         </Link>
                       </Button>
                     )}

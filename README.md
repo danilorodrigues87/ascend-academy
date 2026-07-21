@@ -78,26 +78,32 @@ npm run dev
 
 ### Credenciais de demonstração
 
+Com mocks (sem `VITE_API_BASE_URL`):
 ```
 E-mail:  ana.souza@exemplo.com.br
 Senha:   aurora123
 ```
 
+Com API real: use e-mail/senha de um aluno (`nivel=Cliente`) cadastrado no painel-cti, com matrícula ativa e curso EAD publicado.
+
 ---
 
 ## 🔐 Variáveis de ambiente
 
-Crie um arquivo `.env` na raiz (opcional enquanto está tudo mockado):
+Crie `.env` na raiz:
 
 ```env
-# URL base da API REST em PHP (quando existir)
-VITE_API_BASE_URL=http://localhost/api-ead
+# API aluno do painel-cti
+VITE_API_BASE_URL=http://localhost/pjt/painel-cti/api/v1/student
 ```
 
+Sem `VITE_API_BASE_URL`, os services usam mocks. Com a variável, auth/cursos/aulas/avaliações/roleplay/IA/certificados batem na API.
+
 Regras:
-- Variáveis expostas no front-end **DEVEM** ter o prefixo `VITE_`.
-- Nunca coloque segredos aqui — este bundle vai para o navegador.
-- Variáveis de servidor (server functions) usam `process.env.*`, sem prefixo.
+- Prefixo `VITE_` no front.
+- Nunca coloque a API key de IA aqui — fica só no painel (escola), criptografada.
+- No painel `.env`: `JWT_KEY` preenchido + `STUDENT_CORS_ORIGINS=http://localhost:8080`
+- SQL: colar `painel-cti/database/lms_ead.sql` no phpMyAdmin.
 
 ---
 

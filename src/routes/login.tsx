@@ -8,6 +8,7 @@ import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Logo } from "@/components/common/Logo";
 import { Eye, EyeOff, ArrowRight } from "lucide-react";
+import { USE_API } from "@/services/http";
 
 export const Route = createFileRoute("/login")({
   component: LoginPage,
@@ -20,8 +21,8 @@ export const Route = createFileRoute("/login")({
 });
 
 function LoginPage() {
-  const [email, setEmail] = useState("ana.souza@exemplo.com.br");
-  const [password, setPassword] = useState("aurora123");
+  const [email, setEmail] = useState(USE_API ? "" : "ana.souza@exemplo.com.br");
+  const [password, setPassword] = useState(USE_API ? "" : "aurora123");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
@@ -32,10 +33,11 @@ function LoginPage() {
     setLoading(true);
     try {
       await login({ email, password });
-      toast.success("Bem-vinda de volta!");
+      toast.success("Bem-vindo(a) de volta!");
       navigate({ to: "/dashboard" });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Falha no login");
+      console.error("[login]", err);
     } finally {
       setLoading(false);
     }
@@ -148,8 +150,20 @@ function LoginPage() {
 
           <div className="mt-6">
             <Card className="border-dashed p-4">
-              <p className="text-xs font-medium text-muted-foreground">Credenciais de demonstração</p>
-              <p className="mt-1 font-mono text-xs">ana.souza@exemplo.com.br · aurora123</p>
+              {USE_API ? (
+                <>
+                  <p className="text-xs font-medium text-muted-foreground">API conectada ao painel-cti</p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Use e-mail e senha de um aluno cadastrado no painel (nível Cliente), com matrícula ativa.
+                    O login demo (ana.souza) não funciona com a API real.
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p className="text-xs font-medium text-muted-foreground">Credenciais de demonstração (mock)</p>
+                  <p className="mt-1 font-mono text-xs">ana.souza@exemplo.com.br · aurora123</p>
+                </>
+              )}
             </Card>
           </div>
 

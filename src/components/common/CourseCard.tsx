@@ -5,22 +5,41 @@ import { Card } from "@/components/ui/card";
 import { Link } from "@tanstack/react-router";
 import { Clock, Layers, PlayCircle, Star } from "lucide-react";
 import type { Course } from "@/types";
+import { continueLabel, resolveContinueLesson } from "@/utils/continueLesson";
+
+function Cover({ course }: { course: Course }) {
+  if (course.coverUrl) {
+    return (
+      <img
+        src={course.coverUrl}
+        alt={course.title}
+        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+        loading="lazy"
+      />
+    );
+  }
+  const initial = course.title.trim().charAt(0).toUpperCase() || "C";
+  return (
+    <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary/80 via-primary/50 to-muted">
+      <span className="font-display text-5xl font-semibold text-primary-foreground/90">{initial}</span>
+    </div>
+  );
+}
 
 export function CourseCard({ course, variant = "default" }: { course: Course; variant?: "default" | "compact" }) {
+  const lesson = resolveContinueLesson(course);
+  const label = continueLabel(course);
+
   return (
     <Card className="group relative overflow-hidden border-border/60 p-0 transition-all duration-300 hover:-translate-y-1 hover:shadow-elegant">
       <Link
-        to="/courses/$courseId"
-        params={{ courseId: course.id }}
+        to={lesson ? "/courses/$courseId/lessons/$lessonId" : "/courses/$courseId"}
+        params={lesson ? { courseId: course.id, lessonId: lesson.id } : { courseId: course.id }}
+        search={lesson ? { panel: "content" } : undefined}
         className="block"
       >
         <div className="relative aspect-[16/10] overflow-hidden">
-          <img
-            src={course.coverUrl}
-            alt={course.title}
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-            loading="lazy"
-          />
+          <Cover course={course} />
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
           <div className="absolute left-3 top-3 flex gap-2">
             <Badge variant="secondary" className="backdrop-blur">
@@ -29,7 +48,7 @@ export function CourseCard({ course, variant = "default" }: { course: Course; va
           </div>
           <div className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-black/50 px-2 py-1 text-xs text-white backdrop-blur">
             <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-            {course.rating.toFixed(1)}
+            {(course.rating ?? 0).toFixed(1)}
           </div>
           <div className="absolute inset-x-3 bottom-3">
             <h3 className="font-display text-lg font-semibold leading-tight text-white text-balance line-clamp-2">
@@ -57,11 +76,23 @@ export function CourseCard({ course, variant = "default" }: { course: Course; va
         </div>
       </Link>
       <div className="flex gap-2 border-t border-border/60 bg-muted/30 p-3">
-        <Button asChild size="sm" className="flex-1 gap-1">
-          <Link to="/courses/$courseId" params={{ courseId: course.id }}>
-            <PlayCircle className="h-4 w-4" /> Continuar
-          </Link>
-        </Button>
+        {lesson ? (
+          <Button asChild size="sm" className="flex-1 gap-1">
+            <Link
+              to="/courses/$courseId/lessons/$lessonId"
+              params={{ courseId: course.id, lessonId: lesson.id }}
+              search={{ panel: "content" }}
+            >
+              <PlayCircle className="h-4 w-4" /> {label}
+            </Link>
+          </Button>
+        ) : (
+          <Button asChild size="sm" className="flex-1 gap-1">
+            <Link to="/courses/$courseId" params={{ courseId: course.id }}>
+              <PlayCircle className="h-4 w-4" /> Abrir
+            </Link>
+          </Button>
+        )}
         <Button asChild variant="outline" size="sm" className="flex-1">
           <Link to="/courses/$courseId" params={{ courseId: course.id }}>Ver detalhes</Link>
         </Button>

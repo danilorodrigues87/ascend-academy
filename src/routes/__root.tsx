@@ -78,16 +78,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Aurora — Portal do Aluno" },
-      { name: "description", content: "Portal do Aluno da plataforma Aurora EAD. Estude com uma experiência premium, moderna e intuitiva." },
-      { property: "og:title", content: "Aurora — Portal do Aluno" },
-      { property: "og:description", content: "Cursos, avaliações, IA pedagógica, gamificação e certificados." },
+      { title: "CTI Educacional — Portal do Aluno" },
+      { name: "description", content: "Portal do Aluno da CTI Educacional. Estude com uma experiência moderna e intuitiva." },
+      { property: "og:title", content: "CTI Educacional — Portal do Aluno" },
+      { property: "og:description", content: "Cursos online, atividades, assistente IA e ranking da sua escola." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "icon", href: "/brand/cti-logo.png", type: "image/png" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {

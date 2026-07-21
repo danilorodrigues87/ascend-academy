@@ -43,12 +43,41 @@ export interface Lesson {
   title: string;
   description?: string;
   durationMinutes: number;
-  videoUrl: string; // YouTube for now; swap to signed URL later
-  videoProvider: "youtube" | "private";
+  /** Compat: primeiro vídeo (null se só material). */
+  videoUrl: string | null;
+  videoProvider: "youtube" | "private" | null;
+  /** Lista completa de vídeos da aula (0..N). */
+  videos?: {
+    id: string;
+    title: string;
+    url: string;
+    provider: "youtube" | "private";
+    durationMinutes: number;
+    order: number;
+  }[];
   completed: boolean;
   locked: boolean;
   order: number;
   resources?: { id: string; label: string; url: string; type: "pdf" | "link" | "file" }[];
+  needsRewatch?: boolean;
+  unitScore?: number | null;
+  unitPassed?: boolean;
+  cycle?: number;
+}
+
+export interface CurriculumItem {
+  kind: "lesson" | "assessment" | "roleplay";
+  id: string;
+  title: string;
+  order: number;
+  durationMinutes?: number;
+  completed: boolean;
+  locked: boolean;
+  needsRewatch?: boolean;
+  unitScore?: number | null;
+  unitPassed?: boolean;
+  cycle?: number;
+  score?: number | null;
 }
 
 export interface Module {
@@ -58,6 +87,7 @@ export interface Module {
   order: number;
   locked: boolean;
   lessons: Lesson[];
+  curriculum?: CurriculumItem[];
 }
 
 export interface Course {
@@ -66,8 +96,8 @@ export interface Course {
   title: string;
   description: string;
   shortDescription: string;
-  coverUrl: string;
-  bannerUrl: string;
+  coverUrl: string | null;
+  bannerUrl: string | null;
   instructor: CourseInstructor;
   categories: string[];
   level: "Iniciante" | "Intermediário" | "Avançado";
@@ -108,6 +138,7 @@ export interface RankingEntry {
   name: string;
   avatarUrl?: string;
   xp: number;
+  level?: number;
   position: number;
   isCurrentUser?: boolean;
 }
@@ -141,6 +172,31 @@ export interface Assessment {
   attempts: number;
   bestScore?: number;
   questions: AssessmentQuestion[];
+  attempt?: {
+    id: string | null;
+    status: "in_progress" | "completed" | null;
+    score: number | null;
+    feedback: string | null;
+    answers: Record<
+      string,
+      {
+        answer: string;
+        correct: boolean | null;
+        score: number | null;
+        feedback: string | null;
+        locked: boolean;
+      }
+    >;
+    attemptsUsed: number;
+    attemptsMax: number;
+    canStart: boolean;
+    canAnswer: boolean;
+    cycle?: number;
+    rewatchHint?: string | null;
+  };
+  unitScore?: number | null;
+  unitPassed?: boolean;
+  needsRewatch?: boolean;
 }
 
 export interface AssessmentResult {
@@ -152,6 +208,12 @@ export interface AssessmentResult {
   improvements: string[];
   competencies: { name: string; score: number }[];
   submittedAt: string;
+  xpEarned?: number;
+  passed?: boolean;
+  unitScore?: number | null;
+  unitPassed?: boolean | null;
+  needsRewatch?: boolean;
+  unitDetails?: { kind: string; id: string; title: string; score: number | null }[];
 }
 
 // ---------------- Role Play Simulations ----------------
@@ -236,6 +298,8 @@ export interface RolePlaySimulation {
   startedAt: string;
   endedAt?: string;
   durationSeconds: number;
+  timeLimitSeconds?: number;
+  timeRemainingSeconds?: number;
   messages: RolePlayMessage[];
   status: RolePlayStatus;
   score?: number;

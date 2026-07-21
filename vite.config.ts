@@ -6,10 +6,26 @@
 // You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
+const painelTarget = process.env.VITE_PAINEL_PROXY_TARGET || "http://localhost/pjt/painel-cti";
+
 export default defineConfig({
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
     // nitro/vite builds from this
     server: { entry: "server" },
+  },
+  vite: {
+    server: {
+      host: "127.0.0.1",
+      port: 8080,
+      proxy: {
+        // Evita CORS: o browser chama mesma origem; Vite encaminha ao Apache/XAMPP
+        "/api/v1/student": {
+          target: painelTarget,
+          changeOrigin: true,
+          secure: false,
+        },
+      },
+    },
   },
 });

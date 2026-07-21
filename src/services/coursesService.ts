@@ -1,18 +1,33 @@
 import type { Course, DashboardSummary, Lesson } from "@/types";
-import { delay } from "./http";
+import { delay, http, USE_API } from "./http";
 import { mockAchievements, mockCourses, mockNotifications, mockRanking, mockUser } from "./mocks/data";
 
 export const coursesService = {
   async list(): Promise<Course[]> {
+    if (USE_API) {
+      return http.get<Course[]>("/courses");
+    }
     await delay(350);
     return structuredClone(mockCourses);
   },
   async getById(id: string): Promise<Course | null> {
+    if (USE_API) {
+      try {
+        return await http.get<Course>(`/courses/${encodeURIComponent(id)}`);
+      } catch {
+        return null;
+      }
+    }
     await delay(300);
     const c = mockCourses.find((c) => c.id === id || c.slug === id);
     return c ? structuredClone(c) : null;
   },
   async getLesson(courseId: string, lessonId: string): Promise<{ course: Course; lesson: Lesson } | null> {
+    if (USE_API) {
+      return http.get<{ course: Course; lesson: Lesson }>(
+        `/courses/${encodeURIComponent(courseId)}/lessons/${encodeURIComponent(lessonId)}`,
+      );
+    }
     await delay(250);
     const course = mockCourses.find((c) => c.id === courseId || c.slug === courseId);
     if (!course) return null;
@@ -22,16 +37,24 @@ export const coursesService = {
     }
     return null;
   },
-  async markLessonCompleted(courseId: string, lessonId: string): Promise<void> {
+    async markLessonCompleted(courseId: string, lessonId: string): Promise<{ ok?: boolean; xpEarned?: number; message?: string; cycle?: number }> {
+    if (USE_API) {
+      return http.post(`/courses/${encodeURIComponent(courseId)}/lessons/${encodeURIComponent(lessonId)}/complete`);
+    }
     await delay(200);
     const c = mockCourses.find((c) => c.id === courseId);
-    if (!c) return;
+    if (!c) return { ok: true };
     for (const m of c.modules) {
       const l = m.lessons.find((l) => l.id === lessonId);
       if (l) l.completed = true;
     }
+    return { ok: true };
   },
+
   async getDashboard(): Promise<DashboardSummary> {
+    if (USE_API) {
+      return http.get<DashboardSummary>("/dashboard");
+    }
     await delay(400);
     const enrolled = mockCourses.filter((c) => c.enrolled);
     const current = enrolled.find((c) => c.progressPercent > 0 && c.progressPercent < 100) ?? enrolled[0];

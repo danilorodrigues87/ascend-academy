@@ -9,33 +9,35 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
-import { Route as FirstAccessRouteImport } from './routes/first-access'
-import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AppSettingsRouteImport } from './routes/_app.settings'
-import { Route as AppRoleplayRouteImport } from './routes/_app.roleplay'
-import { Route as AppProfileRouteImport } from './routes/_app.profile'
-import { Route as AppNotificationsRouteImport } from './routes/_app.notifications'
-import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
-import { Route as AppCoursesRouteImport } from './routes/_app.courses'
-import { Route as AppContinueRouteImport } from './routes/_app.continue'
-import { Route as AppCertificatesRouteImport } from './routes/_app.certificates'
-import { Route as AppAssessmentsRouteImport } from './routes/_app.assessments'
+import { Route as AppRouteImport } from './routes/_app'
+import { Route as FirstAccessRouteImport } from './routes/first-access'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as AppAiRouteImport } from './routes/_app.ai'
-import { Route as AppRoleplaySimulationIdRouteImport } from './routes/_app.roleplay.$simulationId'
+import { Route as AppAssessmentsRouteImport } from './routes/_app.assessments'
+import { Route as AppCertificatesRouteImport } from './routes/_app.certificates'
+import { Route as AppContinueRouteImport } from './routes/_app.continue'
+import { Route as AppCoursesRouteImport } from './routes/_app.courses'
+import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
+import { Route as AppNotificationsRouteImport } from './routes/_app.notifications'
+import { Route as AppProfileRouteImport } from './routes/_app.profile'
+import { Route as AppRankingRouteImport } from './routes/_app.ranking'
+import { Route as AppRoleplayRouteImport } from './routes/_app.roleplay'
+import { Route as AppSettingsRouteImport } from './routes/_app.settings'
+import { Route as AppCoursesIndexRouteImport } from './routes/_app.courses.index'
 import { Route as AppCoursesCourseIdRouteImport } from './routes/_app.courses.$courseId'
+import { Route as AppRoleplaySimulationIdRouteImport } from './routes/_app.roleplay.$simulationId'
+import { Route as AppCoursesCourseIdIndexRouteImport } from './routes/_app.courses.$courseId.index'
 import { Route as AppCoursesCourseIdLessonsLessonIdRouteImport } from './routes/_app.courses.$courseId.lessons.$lessonId'
 
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
-  id: '/forgot-password',
-  path: '/forgot-password',
+const AppRoute = AppRouteImport.update({
+  id: '/_app',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FirstAccessRoute = FirstAccessRouteImport.update({
@@ -43,53 +45,19 @@ const FirstAccessRoute = FirstAccessRouteImport.update({
   path: '/first-access',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AppRoute = AppRouteImport.update({
-  id: '/_app',
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AppSettingsRoute = AppSettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppRoleplayRoute = AppRoleplayRouteImport.update({
-  id: '/roleplay',
-  path: '/roleplay',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppProfileRoute = AppProfileRouteImport.update({
-  id: '/profile',
-  path: '/profile',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppNotificationsRoute = AppNotificationsRouteImport.update({
-  id: '/notifications',
-  path: '/notifications',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppDashboardRoute = AppDashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppCoursesRoute = AppCoursesRouteImport.update({
-  id: '/courses',
-  path: '/courses',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppContinueRoute = AppContinueRouteImport.update({
-  id: '/continue',
-  path: '/continue',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppCertificatesRoute = AppCertificatesRouteImport.update({
-  id: '/certificates',
-  path: '/certificates',
+const AppAiRoute = AppAiRouteImport.update({
+  id: '/ai',
+  path: '/ai',
   getParentRoute: () => AppRoute,
 } as any)
 const AppAssessmentsRoute = AppAssessmentsRouteImport.update({
@@ -97,20 +65,70 @@ const AppAssessmentsRoute = AppAssessmentsRouteImport.update({
   path: '/assessments',
   getParentRoute: () => AppRoute,
 } as any)
-const AppAiRoute = AppAiRouteImport.update({
-  id: '/ai',
-  path: '/ai',
+const AppCertificatesRoute = AppCertificatesRouteImport.update({
+  id: '/certificates',
+  path: '/certificates',
   getParentRoute: () => AppRoute,
+} as any)
+const AppContinueRoute = AppContinueRouteImport.update({
+  id: '/continue',
+  path: '/continue',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCoursesRoute = AppCoursesRouteImport.update({
+  id: '/courses',
+  path: '/courses',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppDashboardRoute = AppDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppNotificationsRoute = AppNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppProfileRoute = AppProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppRankingRoute = AppRankingRouteImport.update({
+  id: '/ranking',
+  path: '/ranking',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppRoleplayRoute = AppRoleplayRouteImport.update({
+  id: '/roleplay',
+  path: '/roleplay',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSettingsRoute = AppSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCoursesIndexRoute = AppCoursesIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppCoursesRoute,
+} as any)
+const AppCoursesCourseIdRoute = AppCoursesCourseIdRouteImport.update({
+  id: '/$courseId',
+  path: '/$courseId',
+  getParentRoute: () => AppCoursesRoute,
 } as any)
 const AppRoleplaySimulationIdRoute = AppRoleplaySimulationIdRouteImport.update({
   id: '/$simulationId',
   path: '/$simulationId',
   getParentRoute: () => AppRoleplayRoute,
 } as any)
-const AppCoursesCourseIdRoute = AppCoursesCourseIdRouteImport.update({
-  id: '/$courseId',
-  path: '/$courseId',
-  getParentRoute: () => AppCoursesRoute,
+const AppCoursesCourseIdIndexRoute = AppCoursesCourseIdIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppCoursesCourseIdRoute,
 } as any)
 const AppCoursesCourseIdLessonsLessonIdRoute =
   AppCoursesCourseIdLessonsLessonIdRouteImport.update({
@@ -132,10 +150,13 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AppDashboardRoute
   '/notifications': typeof AppNotificationsRoute
   '/profile': typeof AppProfileRoute
+  '/ranking': typeof AppRankingRoute
   '/roleplay': typeof AppRoleplayRouteWithChildren
   '/settings': typeof AppSettingsRoute
   '/courses/$courseId': typeof AppCoursesCourseIdRouteWithChildren
   '/roleplay/$simulationId': typeof AppRoleplaySimulationIdRoute
+  '/courses/': typeof AppCoursesIndexRoute
+  '/courses/$courseId/': typeof AppCoursesCourseIdIndexRoute
   '/courses/$courseId/lessons/$lessonId': typeof AppCoursesCourseIdLessonsLessonIdRoute
 }
 export interface FileRoutesByTo {
@@ -147,14 +168,15 @@ export interface FileRoutesByTo {
   '/assessments': typeof AppAssessmentsRoute
   '/certificates': typeof AppCertificatesRoute
   '/continue': typeof AppContinueRoute
-  '/courses': typeof AppCoursesRouteWithChildren
   '/dashboard': typeof AppDashboardRoute
   '/notifications': typeof AppNotificationsRoute
   '/profile': typeof AppProfileRoute
+  '/ranking': typeof AppRankingRoute
   '/roleplay': typeof AppRoleplayRouteWithChildren
   '/settings': typeof AppSettingsRoute
-  '/courses/$courseId': typeof AppCoursesCourseIdRouteWithChildren
   '/roleplay/$simulationId': typeof AppRoleplaySimulationIdRoute
+  '/courses': typeof AppCoursesIndexRoute
+  '/courses/$courseId': typeof AppCoursesCourseIdIndexRoute
   '/courses/$courseId/lessons/$lessonId': typeof AppCoursesCourseIdLessonsLessonIdRoute
 }
 export interface FileRoutesById {
@@ -172,10 +194,13 @@ export interface FileRoutesById {
   '/_app/dashboard': typeof AppDashboardRoute
   '/_app/notifications': typeof AppNotificationsRoute
   '/_app/profile': typeof AppProfileRoute
+  '/_app/ranking': typeof AppRankingRoute
   '/_app/roleplay': typeof AppRoleplayRouteWithChildren
   '/_app/settings': typeof AppSettingsRoute
   '/_app/courses/$courseId': typeof AppCoursesCourseIdRouteWithChildren
   '/_app/roleplay/$simulationId': typeof AppRoleplaySimulationIdRoute
+  '/_app/courses/': typeof AppCoursesIndexRoute
+  '/_app/courses/$courseId/': typeof AppCoursesCourseIdIndexRoute
   '/_app/courses/$courseId/lessons/$lessonId': typeof AppCoursesCourseIdLessonsLessonIdRoute
 }
 export interface FileRouteTypes {
@@ -193,10 +218,13 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/notifications'
     | '/profile'
+    | '/ranking'
     | '/roleplay'
     | '/settings'
     | '/courses/$courseId'
     | '/roleplay/$simulationId'
+    | '/courses/'
+    | '/courses/$courseId/'
     | '/courses/$courseId/lessons/$lessonId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -208,14 +236,15 @@ export interface FileRouteTypes {
     | '/assessments'
     | '/certificates'
     | '/continue'
-    | '/courses'
     | '/dashboard'
     | '/notifications'
     | '/profile'
+    | '/ranking'
     | '/roleplay'
     | '/settings'
-    | '/courses/$courseId'
     | '/roleplay/$simulationId'
+    | '/courses'
+    | '/courses/$courseId'
     | '/courses/$courseId/lessons/$lessonId'
   id:
     | '__root__'
@@ -232,10 +261,13 @@ export interface FileRouteTypes {
     | '/_app/dashboard'
     | '/_app/notifications'
     | '/_app/profile'
+    | '/_app/ranking'
     | '/_app/roleplay'
     | '/_app/settings'
     | '/_app/courses/$courseId'
     | '/_app/roleplay/$simulationId'
+    | '/_app/courses/'
+    | '/_app/courses/$courseId/'
     | '/_app/courses/$courseId/lessons/$lessonId'
   fileRoutesById: FileRoutesById
 }
@@ -249,25 +281,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/forgot-password': {
-      id: '/forgot-password'
-      path: '/forgot-password'
-      fullPath: '/forgot-password'
-      preLoaderRoute: typeof ForgotPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/first-access': {
-      id: '/first-access'
-      path: '/first-access'
-      fullPath: '/first-access'
-      preLoaderRoute: typeof FirstAccessRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_app': {
@@ -277,67 +295,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/first-access': {
+      id: '/first-access'
+      path: '/first-access'
+      fullPath: '/first-access'
+      preLoaderRoute: typeof FirstAccessRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_app/settings': {
-      id: '/_app/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof AppSettingsRouteImport
-      parentRoute: typeof AppRoute
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_app/roleplay': {
-      id: '/_app/roleplay'
-      path: '/roleplay'
-      fullPath: '/roleplay'
-      preLoaderRoute: typeof AppRoleplayRouteImport
-      parentRoute: typeof AppRoute
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_app/profile': {
-      id: '/_app/profile'
-      path: '/profile'
-      fullPath: '/profile'
-      preLoaderRoute: typeof AppProfileRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/_app/notifications': {
-      id: '/_app/notifications'
-      path: '/notifications'
-      fullPath: '/notifications'
-      preLoaderRoute: typeof AppNotificationsRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/_app/dashboard': {
-      id: '/_app/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof AppDashboardRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/_app/courses': {
-      id: '/_app/courses'
-      path: '/courses'
-      fullPath: '/courses'
-      preLoaderRoute: typeof AppCoursesRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/_app/continue': {
-      id: '/_app/continue'
-      path: '/continue'
-      fullPath: '/continue'
-      preLoaderRoute: typeof AppContinueRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/_app/certificates': {
-      id: '/_app/certificates'
-      path: '/certificates'
-      fullPath: '/certificates'
-      preLoaderRoute: typeof AppCertificatesRouteImport
+    '/_app/ai': {
+      id: '/_app/ai'
+      path: '/ai'
+      fullPath: '/ai'
+      preLoaderRoute: typeof AppAiRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/assessments': {
@@ -347,12 +330,82 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAssessmentsRouteImport
       parentRoute: typeof AppRoute
     }
-    '/_app/ai': {
-      id: '/_app/ai'
-      path: '/ai'
-      fullPath: '/ai'
-      preLoaderRoute: typeof AppAiRouteImport
+    '/_app/certificates': {
+      id: '/_app/certificates'
+      path: '/certificates'
+      fullPath: '/certificates'
+      preLoaderRoute: typeof AppCertificatesRouteImport
       parentRoute: typeof AppRoute
+    }
+    '/_app/continue': {
+      id: '/_app/continue'
+      path: '/continue'
+      fullPath: '/continue'
+      preLoaderRoute: typeof AppContinueRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/courses': {
+      id: '/_app/courses'
+      path: '/courses'
+      fullPath: '/courses'
+      preLoaderRoute: typeof AppCoursesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/dashboard': {
+      id: '/_app/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AppDashboardRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/notifications': {
+      id: '/_app/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof AppNotificationsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/profile': {
+      id: '/_app/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AppProfileRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/ranking': {
+      id: '/_app/ranking'
+      path: '/ranking'
+      fullPath: '/ranking'
+      preLoaderRoute: typeof AppRankingRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/roleplay': {
+      id: '/_app/roleplay'
+      path: '/roleplay'
+      fullPath: '/roleplay'
+      preLoaderRoute: typeof AppRoleplayRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/settings': {
+      id: '/_app/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AppSettingsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/courses/': {
+      id: '/_app/courses/'
+      path: '/'
+      fullPath: '/courses/'
+      preLoaderRoute: typeof AppCoursesIndexRouteImport
+      parentRoute: typeof AppCoursesRoute
+    }
+    '/_app/courses/$courseId': {
+      id: '/_app/courses/$courseId'
+      path: '/$courseId'
+      fullPath: '/courses/$courseId'
+      preLoaderRoute: typeof AppCoursesCourseIdRouteImport
+      parentRoute: typeof AppCoursesRoute
     }
     '/_app/roleplay/$simulationId': {
       id: '/_app/roleplay/$simulationId'
@@ -361,12 +414,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppRoleplaySimulationIdRouteImport
       parentRoute: typeof AppRoleplayRoute
     }
-    '/_app/courses/$courseId': {
-      id: '/_app/courses/$courseId'
-      path: '/$courseId'
-      fullPath: '/courses/$courseId'
-      preLoaderRoute: typeof AppCoursesCourseIdRouteImport
-      parentRoute: typeof AppCoursesRoute
+    '/_app/courses/$courseId/': {
+      id: '/_app/courses/$courseId/'
+      path: '/'
+      fullPath: '/courses/$courseId/'
+      preLoaderRoute: typeof AppCoursesCourseIdIndexRouteImport
+      parentRoute: typeof AppCoursesCourseIdRoute
     }
     '/_app/courses/$courseId/lessons/$lessonId': {
       id: '/_app/courses/$courseId/lessons/$lessonId'
@@ -379,10 +432,12 @@ declare module '@tanstack/react-router' {
 }
 
 interface AppCoursesCourseIdRouteChildren {
+  AppCoursesCourseIdIndexRoute: typeof AppCoursesCourseIdIndexRoute
   AppCoursesCourseIdLessonsLessonIdRoute: typeof AppCoursesCourseIdLessonsLessonIdRoute
 }
 
 const AppCoursesCourseIdRouteChildren: AppCoursesCourseIdRouteChildren = {
+  AppCoursesCourseIdIndexRoute: AppCoursesCourseIdIndexRoute,
   AppCoursesCourseIdLessonsLessonIdRoute:
     AppCoursesCourseIdLessonsLessonIdRoute,
 }
@@ -392,10 +447,12 @@ const AppCoursesCourseIdRouteWithChildren =
 
 interface AppCoursesRouteChildren {
   AppCoursesCourseIdRoute: typeof AppCoursesCourseIdRouteWithChildren
+  AppCoursesIndexRoute: typeof AppCoursesIndexRoute
 }
 
 const AppCoursesRouteChildren: AppCoursesRouteChildren = {
   AppCoursesCourseIdRoute: AppCoursesCourseIdRouteWithChildren,
+  AppCoursesIndexRoute: AppCoursesIndexRoute,
 }
 
 const AppCoursesRouteWithChildren = AppCoursesRoute._addFileChildren(
@@ -423,6 +480,7 @@ interface AppRouteChildren {
   AppDashboardRoute: typeof AppDashboardRoute
   AppNotificationsRoute: typeof AppNotificationsRoute
   AppProfileRoute: typeof AppProfileRoute
+  AppRankingRoute: typeof AppRankingRoute
   AppRoleplayRoute: typeof AppRoleplayRouteWithChildren
   AppSettingsRoute: typeof AppSettingsRoute
 }
@@ -436,6 +494,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppDashboardRoute: AppDashboardRoute,
   AppNotificationsRoute: AppNotificationsRoute,
   AppProfileRoute: AppProfileRoute,
+  AppRankingRoute: AppRankingRoute,
   AppRoleplayRoute: AppRoleplayRouteWithChildren,
   AppSettingsRoute: AppSettingsRoute,
 }
@@ -452,3 +511,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

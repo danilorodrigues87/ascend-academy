@@ -1,5 +1,5 @@
 import { createFileRoute, Outlet, useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/layout/AppSidebar";
 import { Topbar } from "@/components/layout/Topbar";
@@ -14,21 +14,27 @@ export const Route = createFileRoute("/_app")({
 function AppLayout() {
   const { isAuthenticated, loading } = useAuth();
   const navigate = useNavigate();
+  const [clientReady, setClientReady] = useState(false);
 
   useEffect(() => {
-    if (!loading && !isAuthenticated) {
+    setClientReady(true);
+  }, []);
+
+  useEffect(() => {
+    if (clientReady && !loading && !isAuthenticated) {
       navigate({ to: "/login" });
     }
-  }, [isAuthenticated, loading, navigate]);
+  }, [clientReady, isAuthenticated, loading, navigate]);
 
   const { data: notifications = [] } = useQuery({
     queryKey: ["notifications"],
     queryFn: () => notificationsService.list(),
-    enabled: isAuthenticated,
+    enabled: clientReady && isAuthenticated,
   });
   const unread = notifications.filter((n) => !n.read).length;
 
-  if (loading || !isAuthenticated) {
+  // Evita mismatch SSR/cliente: no servidor e no 1º paint mostra spinner
+  if (!clientReady || loading || !isAuthenticated) {
     return (
       <div className="grid min-h-screen place-items-center bg-background">
         <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />

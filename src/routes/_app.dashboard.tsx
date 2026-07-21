@@ -95,16 +95,24 @@ function DashboardPage() {
       {/* Continue + Next lesson */}
       <section className="grid gap-6 lg:grid-cols-3">
         <Card className="lg:col-span-2 overflow-hidden p-0">
-          {isLoading || !data?.continueLesson ? (
+          {isLoading ? (
             <Skeleton className="h-64 w-full" />
-          ) : (
+          ) : data?.continueLesson ? (
             <div className="relative">
-              <div className="relative aspect-[21/9] overflow-hidden">
-                <img src={data.continueLesson.course.bannerUrl} alt="" className="h-full w-full object-cover" />
+              <div className="relative aspect-[21/9] overflow-hidden bg-gradient-to-br from-primary/60 to-muted">
+                {data.continueLesson.course.bannerUrl || data.continueLesson.course.coverUrl ? (
+                  <img
+                    src={data.continueLesson.course.bannerUrl || data.continueLesson.course.coverUrl || ""}
+                    alt=""
+                    className="h-full w-full object-cover"
+                  />
+                ) : null}
                 <div className="absolute inset-0 bg-gradient-to-r from-background via-background/70 to-transparent" />
               </div>
               <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-8">
-                <Badge className="w-fit">Continue de onde parou</Badge>
+                <Badge className="w-fit">
+                  {(data.continueLesson.course.progressPercent ?? 0) > 0 ? "Continue de onde parou" : "Comece agora"}
+                </Badge>
                 <h2 className="mt-3 font-display text-2xl font-semibold text-balance md:text-3xl">
                   {data.continueLesson.lesson.title}
                 </h2>
@@ -120,11 +128,19 @@ function DashboardPage() {
                         lessonId: data.continueLesson.lesson.id,
                       }}
                     >
-                      <PlayCircle className="h-5 w-5" /> Continuar aula
+                      <PlayCircle className="h-5 w-5" />
+                      {(data.continueLesson.course.progressPercent ?? 0) > 0 ? "Continuar aula" : "Começar aula"}
                     </Link>
                   </Button>
                 </div>
               </div>
+            </div>
+          ) : (
+            <div className="flex h-64 flex-col items-center justify-center gap-3 p-8 text-center">
+              <p className="text-muted-foreground">Nenhum curso para continuar. Matricule-se e publique o EAD no painel.</p>
+              <Button asChild variant="outline">
+                <Link to="/courses">Meus cursos</Link>
+              </Button>
             </div>
           )}
         </Card>

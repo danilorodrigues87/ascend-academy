@@ -1,14 +1,26 @@
 import type { ChatConversation, ChatMessage } from "@/types";
-import { delay } from "./http";
+import { delay, http, USE_API } from "./http";
 import { mockConversations } from "./mocks/data";
 
-// Prepared for future OpenAI/backend integration.
 export const aiService = {
   async listConversations(): Promise<ChatConversation[]> {
+    if (USE_API) {
+      return http.get<ChatConversation[]>("/ai/conversations");
+    }
     await delay(200);
     return structuredClone(mockConversations);
   },
-  async createConversation(title = "Nova conversa"): Promise<ChatConversation> {
+  async createConversation(
+    title = "Nova conversa",
+    meta?: { courseId?: string; lessonId?: string },
+  ): Promise<ChatConversation> {
+    if (USE_API) {
+      return http.post<ChatConversation>("/ai/conversations", {
+        title,
+        courseId: meta?.courseId,
+        lessonId: meta?.lessonId,
+      });
+    }
     await delay(150);
     const conv: ChatConversation = {
       id: "conv_" + Date.now(),
@@ -20,7 +32,17 @@ export const aiService = {
     mockConversations.unshift(conv);
     return structuredClone(conv);
   },
-  async sendMessage(conversationId: string, content: string): Promise<ChatMessage> {
+  async sendMessage(
+    conversationId: string,
+    content: string,
+    meta?: { courseId?: string; lessonId?: string },
+  ): Promise<ChatMessage> {
+    if (USE_API) {
+      return http.post<ChatMessage>(
+        `/ai/conversations/${encodeURIComponent(conversationId)}/messages`,
+        { content, courseId: meta?.courseId, lessonId: meta?.lessonId },
+      );
+    }
     await delay(900);
     const conv = mockConversations.find((c) => c.id === conversationId);
     const userMsg: ChatMessage = {
@@ -32,7 +54,7 @@ export const aiService = {
     const assistantMsg: ChatMessage = {
       id: "m_" + (Date.now() + 1),
       role: "assistant",
-      content: buildMockAnswer(content),
+      content: `Resposta simulada sobre "${content.slice(0, 60)}".`,
       createdAt: new Date().toISOString(),
     };
     if (conv) {
@@ -42,8 +64,3 @@ export const aiService = {
     return assistantMsg;
   },
 };
-
-function buildMockAnswer(q: string) {
-  const trimmed = q.trim();
-  return `Ótima pergunta sobre **"${trimmed.slice(0, 60)}${trimmed.length > 60 ? "..." : ""}"**.\n\nAqui vai uma explicação didática:\n\n1. **Conceito central** — comece entendendo o problema em si.\n2. **Exemplo prático** — pense num caso do seu dia a dia.\n3. **Próximo passo** — tente aplicar o conceito em um exercício.\n\nQuer que eu gere um **exercício** ou um **resumo em tópicos** sobre isso?`;
-}

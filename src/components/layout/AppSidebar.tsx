@@ -3,14 +3,11 @@ import {
   LayoutDashboard,
   BookOpen,
   PlayCircle,
-  ClipboardCheck,
-  Sparkles,
   Award,
   User,
   Settings,
   LogOut,
-  Bell,
-  MessagesSquare,
+  Trophy,
 } from "lucide-react";
 import {
   Sidebar,
@@ -35,11 +32,8 @@ const nav = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
   { title: "Meus Cursos", url: "/courses", icon: BookOpen },
   { title: "Continuar estudando", url: "/continue", icon: PlayCircle },
-  { title: "Avaliações", url: "/assessments", icon: ClipboardCheck },
-  { title: "Simulações IA", url: "/roleplay", icon: MessagesSquare },
-  { title: "IA Pedagógica", url: "/ai", icon: Sparkles },
+  { title: "Ranking da escola", url: "/ranking", icon: Trophy },
   { title: "Certificados", url: "/certificates", icon: Award },
-  { title: "Notificações", url: "/notifications", icon: Bell },
 ];
 
 const account = [

@@ -58,9 +58,20 @@ type Phase = "briefing" | "chat" | "evaluation";
 function RolePlayRunnerPage() {
   const { simulationId } = Route.useParams();
   const navigate = useNavigate();
-  const { data: scenario, isLoading } = useQuery({
-    queryKey: ["roleplay:scenario", simulationId],
-    queryFn: () => rolePlayService.getScenario(simulationId),
+
+  // Aceita id de cenário (lista /roleplay) OU id de simulação (curriculum antigo)
+  const { data: boot, isLoading } = useQuery({
+    queryKey: ["roleplay:boot", simulationId],
+    queryFn: async () => {
+      const existing = await rolePlayService.getSimulation(simulationId);
+      if (existing) {
+        const scenario = await rolePlayService.getScenario(existing.scenarioId);
+        return { mode: "simulation" as const, simulation: existing, scenario };
+      }
+      const scenario = await rolePlayService.getScenario(simulationId);
+      if (scenario) return { mode: "scenario" as const, scenario, simulation: null };
+      return null;
+    },
   });
 
   const [phase, setPhase] = useState<Phase>("briefing");
@@ -68,8 +79,12 @@ function RolePlayRunnerPage() {
   const [simulation, setSimulation] = useState<RolePlaySimulation | null>(null);
 
   useEffect(() => {
-    if (scenario) setDifficulty(scenario.difficulty);
-  }, [scenario]);
+    if (boot?.scenario) setDifficulty(boot.scenario.difficulty);
+    if (boot?.mode === "simulation" && boot.simulation) {
+      setSimulation(boot.simulation);
+      setPhase(boot.simulation.endedAt ? "evaluation" : "chat");
+    }
+  }, [boot]);
 
   const start = useMutation({
     mutationFn: () => rolePlayService.startSimulation(simulationId, difficulty),
@@ -80,6 +95,8 @@ function RolePlayRunnerPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const scenario = boot?.scenario ?? null;
+
   if (isLoading || !scenario) {
     return (
       <div className="mx-auto max-w-4xl space-y-4 p-4 md:p-8">
@@ -89,7 +106,7 @@ function RolePlayRunnerPage() {
     );
   }
 
-  if (phase === "briefing") {
+  if (phase === "briefing" && boot?.mode === "scenario") {
     return (
       <BriefingScreen
         scenario={scenario}
@@ -102,11 +119,13 @@ function RolePlayRunnerPage() {
     );
   }
 
-  if (phase === "chat" && simulation) {
+  const activeSim = simulation ?? (boot?.mode === "simulation" ? boot.simulation : null);
+
+  if (phase === "chat" && activeSim) {
     return (
       <ChatScreen
         scenario={scenario}
-        simulation={simulation}
+        simulation={activeSim}
         difficulty={difficulty}
         onUpdated={setSimulation}
         onFinish={(finished) => {
@@ -117,11 +136,11 @@ function RolePlayRunnerPage() {
     );
   }
 
-  if (phase === "evaluation" && simulation) {
+  if ((phase === "evaluation" || activeSim?.endedAt) && activeSim) {
     return (
       <EvaluationScreen
         scenario={scenario}
-        simulation={simulation}
+        simulation={activeSim}
         onReplay={() => {
           setSimulation(null);
           setPhase("briefing");

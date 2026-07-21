@@ -12,9 +12,15 @@ interface AuthCtx {
 
 const Ctx = createContext<AuthCtx | null>(null);
 
+function readSession(): AuthSession | null {
+  if (typeof window === "undefined") return null;
+  return authService.getSession();
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [session, setSession] = useState<AuthSession | null>(null);
-  const [loading, setLoading] = useState(true);
+  // No cliente, lê a sessão já no 1º render (evita spinner eterno após F5)
+  const [session, setSession] = useState<AuthSession | null>(() => readSession());
+  const [loading, setLoading] = useState(() => typeof window === "undefined");
 
   useEffect(() => {
     setSession(authService.getSession());
