@@ -1,0 +1,5 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home1/dncurs82/aluno.ctieducacional.com.br/
+    - /bin/cp -R .output/public/* $DEPLOYPATH
