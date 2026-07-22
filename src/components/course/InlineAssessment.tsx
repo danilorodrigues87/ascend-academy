@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { assessmentsService } from "@/services";
+import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -10,13 +11,20 @@ import type { AssessmentResult } from "@/types";
 
 export function InlineAssessment({
   assessmentId,
+  courseId,
+  lessonId,
   onBack,
+  onAdvance,
 }: {
   courseId: string;
+  lessonId?: string;
   assessmentId: string;
   onBack: () => void;
+  /** Avança para o próximo item do currículo (após finalizar sem precisar reassistir). */
+  onAdvance?: () => void;
 }) {
   const qc = useQueryClient();
+  const { refreshUser } = useAuth();
   const { data, isLoading, refetch } = useQuery({
     queryKey: ["assessment", assessmentId],
     queryFn: () => assessmentsService.getById(assessmentId),
@@ -25,12 +33,23 @@ export function InlineAssessment({
   const [draft, setDraft] = useState("");
   const [result, setResult] = useState<AssessmentResult | null>(null);
   const [busy, setBusy] = useState(false);
+  const [autoAdvancePending, setAutoAdvancePending] = useState(false);
 
   useEffect(() => {
     setQIndex(0);
     setDraft("");
     setResult(null);
+    setAutoAdvancePending(false);
   }, [assessmentId]);
+
+  useEffect(() => {
+    if (!autoAdvancePending || !onAdvance || result?.needsRewatch) return;
+    const t = setTimeout(() => {
+      setAutoAdvancePending(false);
+      onAdvance();
+    }, 1800);
+    return () => clearTimeout(t);
+  }, [autoAdvancePending, onAdvance, result?.needsRewatch]);
 
   const startMut = useMutation({
     mutationFn: () => assessmentsService.start(assessmentId),
@@ -68,8 +87,17 @@ export function InlineAssessment({
         setResult(fin);
         toast.success(`Atividade finalizada: ${fin.score}%${fin.xpEarned ? ` · +${fin.xpEarned} XP` : ""}`);
         qc.invalidateQueries({ queryKey: ["course"] });
+        qc.invalidateQueries({ queryKey: ["lesson", courseId] });
+        if (lessonId) {
+          qc.invalidateQueries({ queryKey: ["lesson", courseId, lessonId] });
+        }
         qc.invalidateQueries({ queryKey: ["ranking"] });
+        qc.invalidateQueries({ queryKey: ["dashboard"] });
+        await refreshUser();
         await refetch();
+        if (!fin.needsRewatch && onAdvance) {
+          setAutoAdvancePending(true);
+        }
       } else if (qIndex < questions.length - 1) {
         setQIndex((i) => i + 1);
       }
@@ -84,6 +112,7 @@ export function InlineAssessment({
     const score = result?.score ?? attempt?.score ?? 0;
     const feedback = result?.feedback ?? attempt?.feedback ?? "";
     const xp = result?.xpEarned;
+    const canAdvance = !!onAdvance && !(result?.needsRewatch);
     return (
       <Card className="space-y-4 p-6">
         <div className="flex items-start justify-between gap-4">
@@ -105,17 +134,34 @@ export function InlineAssessment({
         <p className="text-xs text-muted-foreground">
           Tentativas: {attempt?.attemptsUsed ?? 0}/{attempt?.attemptsMax ?? data.attempts}
         </p>
-        {attempt?.canStart && (
-          <Button
-            onClick={() => {
-              setResult(null);
-              setQIndex(0);
-              startMut.mutate();
-            }}
-          >
-            Nova tentativa
-          </Button>
+        {autoAdvancePending && canAdvance && (
+          <p className="text-xs text-muted-foreground">Avançando para o próximo item…</p>
         )}
+        <div className="flex flex-wrap gap-2">
+          {attempt?.canStart && (
+            <Button
+              onClick={() => {
+                setResult(null);
+                setAutoAdvancePending(false);
+                setQIndex(0);
+                startMut.mutate();
+              }}
+            >
+              Nova tentativa
+            </Button>
+          )}
+          {canAdvance && (
+            <Button
+              variant={autoAdvancePending ? "default" : "outline"}
+              onClick={() => {
+                setAutoAdvancePending(false);
+                onAdvance?.();
+              }}
+            >
+              Próximo
+            </Button>
+          )}
+        </div>
       </Card>
     );
   }

@@ -8,6 +8,7 @@ import {
   Settings,
   LogOut,
   Trophy,
+  Medal,
 } from "lucide-react";
 import {
   Sidebar,
@@ -32,7 +33,8 @@ const nav = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
   { title: "Meus Cursos", url: "/courses", icon: BookOpen },
   { title: "Continuar estudando", url: "/continue", icon: PlayCircle },
-  { title: "Ranking da escola", url: "/ranking", icon: Trophy },
+  { title: "Conquistas", url: "/achievements", icon: Medal },
+  { title: "Ranking", url: "/ranking", icon: Trophy },
   { title: "Certificados", url: "/certificates", icon: Award },
 ];
 

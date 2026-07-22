@@ -23,7 +23,7 @@ import {
 
 export const Route = createFileRoute("/_app/assessments")({
   component: AssessmentsPage,
-  head: () => ({ meta: [{ title: "Avaliações — Aurora" }] }),
+  head: () => ({ meta: [{ title: "Avaliações — CTI Educacional" }] }),
 });
 
 function AssessmentsPage() {

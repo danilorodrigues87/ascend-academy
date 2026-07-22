@@ -132,6 +132,7 @@ export const rolePlayService = {
     sim.endedAt = new Date().toISOString();
     sim.status = "approved";
     sim.score = 80;
+    sim.xpEarned = 64;
     return structuredClone(sim);
   },
 };

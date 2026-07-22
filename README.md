@@ -99,6 +99,14 @@ VITE_API_BASE_URL=http://localhost/pjt/painel-cti/api/v1/student
 
 Sem `VITE_API_BASE_URL`, os services usam mocks. Com a variável, auth/cursos/aulas/avaliações/roleplay/IA/certificados batem na API.
 
+### Certificados (`/certificates`)
+
+- Emitidos **automaticamente** pelo painel quando o aluno atinge **100%** do curso (sem liberação manual).
+- A API devolve `status: "valid" | "outdated"` e `progressPercent`.
+- **valid:** botões Visualizar / Baixar PDF (`GET /certificates/{id}/html`).
+- **outdated:** a escola editou o curso e o progresso caiu — card com CTA “Continuar curso”; PDF retorna 403 até reconcluir 100% (aí o snapshot atualiza e o `codigo` permanece).
+- Regras de emissão/SQL: ver `painel-cti/ARCHITECTURE.md` (fonte da verdade do LMS).
+
 Regras:
 - Prefixo `VITE_` no front.
 - Nunca coloque a API key de IA aqui — fica só no painel (escola), criptografada.
@@ -296,12 +304,20 @@ Se usar **Git Deploy** do cPanel (`.cpanel.yml`), o script copia `dist/client/` 
 
 ---
 
+## 🧭 Estado atual (LMS)
+
+Portal ligado à API `/api/v1/student` do painel-cti. Go-live: seguir
+`painel-cti/database/LMS_CHECKLIST_PRODUCAO.md` + `lms_verificar_producao.sql`.
+
+Polish recente: `EmptyState` em cursos/ranking/certificados/notificações/conquistas;
+abas de cursos com scroll horizontal no mobile; CTAs em estados vazios.
+
 ## 🧭 Próximos passos sugeridos
 
-- [ ] Implementar API REST em PHP seguindo os contratos em `src/types/`
-- [ ] Substituir mocks nos services por chamadas `http.*`
-- [ ] Implementar refresh token no `authService`
-- [ ] Adicionar testes (Vitest está disponível)
+- [ ] Smoke test completo do checklist de produção
+- [ ] Deploy Ascend (`npm run build` → publicar `dist`)
+- [ ] Ajustes finos de UX no player (só sob demanda)
+
 
 ---
 

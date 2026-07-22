@@ -24,7 +24,7 @@ import { initials, relativeTime } from "@/utils/format";
 
 export const Route = createFileRoute("/_app/ai")({
   component: AIPage,
-  head: () => ({ meta: [{ title: "IA Pedagógica — Aurora" }] }),
+  head: () => ({ meta: [{ title: "IA Pedagógica — CTI Educacional" }] }),
 });
 
 const suggestions = [

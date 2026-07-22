@@ -3,9 +3,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Link } from "@tanstack/react-router";
-import { Clock, Layers, PlayCircle, Star } from "lucide-react";
+import { Clock, Layers, PlayCircle } from "lucide-react";
 import type { Course } from "@/types";
 import { continueLabel, resolveContinueLesson } from "@/utils/continueLesson";
+import { CourseRatingBadge } from "@/components/common/CourseRating";
 
 function Cover({ course }: { course: Course }) {
   if (course.coverUrl) {
@@ -46,9 +47,8 @@ export function CourseCard({ course, variant = "default" }: { course: Course; va
               {course.level}
             </Badge>
           </div>
-          <div className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-black/50 px-2 py-1 text-xs text-white backdrop-blur">
-            <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-            {(course.rating ?? 0).toFixed(1)}
+          <div className="absolute right-3 top-3">
+            <CourseRatingBadge rating={course.rating} ratingCount={course.ratingCount} />
           </div>
           <div className="absolute inset-x-3 bottom-3">
             <h3 className="font-display text-lg font-semibold leading-tight text-white text-balance line-clamp-2">
@@ -62,9 +62,15 @@ export function CourseCard({ course, variant = "default" }: { course: Course; va
             <p className="line-clamp-2 text-sm text-muted-foreground">{course.shortDescription}</p>
           )}
           <div className="flex items-center gap-3 text-xs text-muted-foreground">
-            <span className="inline-flex items-center gap-1"><Clock className="h-3.5 w-3.5" /> {course.workloadHours}h</span>
-            <span className="inline-flex items-center gap-1"><Layers className="h-3.5 w-3.5" /> {course.modulesCount} módulos</span>
-            <span className="inline-flex items-center gap-1"><PlayCircle className="h-3.5 w-3.5" /> {course.lessonsCount} aulas</span>
+            <span className="inline-flex items-center gap-1">
+              <Clock className="h-3.5 w-3.5" /> {course.workloadHours}h
+            </span>
+            <span className="inline-flex items-center gap-1">
+              <Layers className="h-3.5 w-3.5" /> {course.modulesCount} módulos
+            </span>
+            <span className="inline-flex items-center gap-1">
+              <PlayCircle className="h-3.5 w-3.5" /> {course.lessonsCount} aulas
+            </span>
           </div>
           <div className="space-y-1.5">
             <div className="flex items-center justify-between text-xs">
@@ -94,7 +100,9 @@ export function CourseCard({ course, variant = "default" }: { course: Course; va
           </Button>
         )}
         <Button asChild variant="outline" size="sm" className="flex-1">
-          <Link to="/courses/$courseId" params={{ courseId: course.id }}>Ver detalhes</Link>
+          <Link to="/courses/$courseId" params={{ courseId: course.id }}>
+            Ver detalhes
+          </Link>
         </Button>
       </div>
     </Card>

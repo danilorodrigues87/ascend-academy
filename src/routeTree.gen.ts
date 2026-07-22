@@ -11,9 +11,10 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppRouteImport } from './routes/_app'
-import { Route as FirstAccessRouteImport } from './routes/first-access'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as AppAchievementsRouteImport } from './routes/_app.achievements'
 import { Route as AppAiRouteImport } from './routes/_app.ai'
 import { Route as AppAssessmentsRouteImport } from './routes/_app.assessments'
 import { Route as AppCertificatesRouteImport } from './routes/_app.certificates'
@@ -40,11 +41,6 @@ const AppRoute = AppRouteImport.update({
   id: '/_app',
   getParentRoute: () => rootRouteImport,
 } as any)
-const FirstAccessRoute = FirstAccessRouteImport.update({
-  id: '/first-access',
-  path: '/first-access',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
   id: '/forgot-password',
   path: '/forgot-password',
@@ -54,6 +50,16 @@ const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
   getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppAchievementsRoute = AppAchievementsRouteImport.update({
+  id: '/achievements',
+  path: '/achievements',
+  getParentRoute: () => AppRoute,
 } as any)
 const AppAiRoute = AppAiRouteImport.update({
   id: '/ai',
@@ -139,9 +145,10 @@ const AppCoursesCourseIdLessonsLessonIdRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/first-access': typeof FirstAccessRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/achievements': typeof AppAchievementsRoute
   '/ai': typeof AppAiRoute
   '/assessments': typeof AppAssessmentsRoute
   '/certificates': typeof AppCertificatesRoute
@@ -161,9 +168,10 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/first-access': typeof FirstAccessRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/achievements': typeof AppAchievementsRoute
   '/ai': typeof AppAiRoute
   '/assessments': typeof AppAssessmentsRoute
   '/certificates': typeof AppCertificatesRoute
@@ -183,9 +191,10 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_app': typeof AppRouteWithChildren
-  '/first-access': typeof FirstAccessRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/_app/achievements': typeof AppAchievementsRoute
   '/_app/ai': typeof AppAiRoute
   '/_app/assessments': typeof AppAssessmentsRoute
   '/_app/certificates': typeof AppCertificatesRoute
@@ -207,9 +216,10 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/first-access'
     | '/forgot-password'
     | '/login'
+    | '/reset-password'
+    | '/achievements'
     | '/ai'
     | '/assessments'
     | '/certificates'
@@ -229,9 +239,10 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/first-access'
     | '/forgot-password'
     | '/login'
+    | '/reset-password'
+    | '/achievements'
     | '/ai'
     | '/assessments'
     | '/certificates'
@@ -250,9 +261,10 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_app'
-    | '/first-access'
     | '/forgot-password'
     | '/login'
+    | '/reset-password'
+    | '/_app/achievements'
     | '/_app/ai'
     | '/_app/assessments'
     | '/_app/certificates'
@@ -274,9 +286,9 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRoute: typeof AppRouteWithChildren
-  FirstAccessRoute: typeof FirstAccessRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   LoginRoute: typeof LoginRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -295,13 +307,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/first-access': {
-      id: '/first-access'
-      path: '/first-access'
-      fullPath: '/first-access'
-      preLoaderRoute: typeof FirstAccessRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/forgot-password': {
       id: '/forgot-password'
       path: '/forgot-password'
@@ -315,6 +320,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app/achievements': {
+      id: '/_app/achievements'
+      path: '/achievements'
+      fullPath: '/achievements'
+      preLoaderRoute: typeof AppAchievementsRouteImport
+      parentRoute: typeof AppRoute
     }
     '/_app/ai': {
       id: '/_app/ai'
@@ -472,6 +491,7 @@ const AppRoleplayRouteWithChildren = AppRoleplayRoute._addFileChildren(
 )
 
 interface AppRouteChildren {
+  AppAchievementsRoute: typeof AppAchievementsRoute
   AppAiRoute: typeof AppAiRoute
   AppAssessmentsRoute: typeof AppAssessmentsRoute
   AppCertificatesRoute: typeof AppCertificatesRoute
@@ -486,6 +506,7 @@ interface AppRouteChildren {
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppAchievementsRoute: AppAchievementsRoute,
   AppAiRoute: AppAiRoute,
   AppAssessmentsRoute: AppAssessmentsRoute,
   AppCertificatesRoute: AppCertificatesRoute,
@@ -504,9 +525,9 @@ const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
-  FirstAccessRoute: FirstAccessRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   LoginRoute: LoginRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

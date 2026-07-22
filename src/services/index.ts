@@ -4,4 +4,5 @@ export { notificationsService, certificatesService } from "./notificationsServic
 export { assessmentsService } from "./assessmentsService";
 export { aiService } from "./aiService";
 export { rolePlayService } from "./rolePlayService";
+export { achievementsService } from "./achievementsService";
 export { http, delay } from "./http";

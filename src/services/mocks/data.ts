@@ -25,7 +25,6 @@ export const mockUser: User = {
   streakDays: 17,
   totalStudyMinutes: 4380,
   createdAt: "2024-02-10T14:00:00Z",
-  firstAccess: false,
 };
 
 // ---------------- Courses ----------------
@@ -348,12 +347,12 @@ export const mockNotifications: Notification[] = [
 
 // ---------------- Achievements & Ranking ----------------
 export const mockAchievements: Achievement[] = [
-  { id: "ach_1", title: "Primeira aula", description: "Assistiu sua primeira aula", icon: "Sparkles", unlockedAt: "2024-02-11" },
-  { id: "ach_2", title: "Maratonista", description: "Assistiu 10 aulas em uma semana", icon: "Flame", unlockedAt: "2024-05-01" },
-  { id: "ach_3", title: "Curioso", description: "Fez 20 perguntas à IA", icon: "Brain", unlockedAt: "2024-07-14" },
-  { id: "ach_4", title: "Mestre do Design", description: "Concluiu um curso avançado", icon: "Trophy", progress: 62, goal: 100 },
-  { id: "ach_5", title: "Constância", description: "30 dias consecutivos", icon: "Calendar", progress: 17, goal: 30 },
-  { id: "ach_6", title: "Nível 15", description: "Alcance o nível 15", icon: "Star", progress: 12, goal: 15 },
+  { id: "ach_1", title: "Assistiu sua primeira aula", subtitle: "Primeiro passo", description: "Assistiu sua primeira aula", howTo: "Conclua 1 aula.", icon: "Sparkles", rarity: "bronze", unlockedAt: "2024-02-11" },
+  { id: "ach_2", title: "Assistiu 10 aulas em uma semana", subtitle: "Maratonista", description: "Assistiu 10 aulas", icon: "Flame", rarity: "prata", unlockedAt: "2024-05-01" },
+  { id: "ach_3", title: "Fez 20 perguntas à IA", subtitle: "Curioso", description: "Fez 20 perguntas à IA", icon: "Brain", rarity: "prata", unlockedAt: "2024-07-14" },
+  { id: "ach_4", title: "Concluiu um curso avançado", subtitle: "Mestre", description: "Concluiu um curso", icon: "Trophy", rarity: "ouro", progress: 62, goal: 100 },
+  { id: "ach_5", title: "30 dias consecutivos", subtitle: "Constância", description: "30 dias de streak", icon: "Calendar", rarity: "ouro", progress: 17, goal: 30 },
+  { id: "ach_6", title: "Alcance o nível 15", subtitle: "Nível 15", description: "Chegue ao nível 15", icon: "Star", rarity: "lendario", progress: 12, goal: 15 },
 ];
 
 export const mockRanking: RankingEntry[] = [
@@ -373,6 +372,9 @@ export const mockCertificates: Certificate[] = [
     courseTitle: "Marketing Digital para SaaS",
     issuedAt: "2025-11-20",
     workloadHours: 22,
+    status: "valid",
+    progressPercent: 100,
+    code: "mockcert01",
   },
 ];
 

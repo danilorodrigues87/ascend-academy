@@ -23,18 +23,21 @@ import {
 } from "lucide-react";
 import { formatMinutes, initials, relativeTime } from "@/utils/format";
 import * as Icons from "lucide-react";
+import { filterNotificationsByPrefs, useNotificationPrefs } from "@/utils/notificationPrefs";
 
 export const Route = createFileRoute("/_app/dashboard")({
   component: DashboardPage,
-  head: () => ({ meta: [{ title: "Dashboard — Aurora" }] }),
+  head: () => ({ meta: [{ title: "Dashboard — CTI Educacional" }] }),
 });
 
 function DashboardPage() {
   const { user } = useAuth();
+  const [prefs] = useNotificationPrefs();
   const { data, isLoading } = useQuery({
     queryKey: ["dashboard"],
     queryFn: () => coursesService.getDashboard(),
   });
+  const dashNotifs = filterNotificationsByPrefs(data?.notifications ?? [], prefs);
 
   return (
     <div className="mx-auto max-w-7xl space-y-8 p-4 md:p-8">
@@ -47,7 +50,7 @@ function DashboardPage() {
               <AvatarFallback>{user ? initials(user.name) : "AA"}</AvatarFallback>
             </Avatar>
             <div className="min-w-0">
-              <p className="text-sm text-muted-foreground">Olá, bem-vinda de volta 👋</p>
+              <p className="text-sm text-muted-foreground">Olá, bem-vindo(a) de volta</p>
               <h1 className="truncate font-display text-2xl font-semibold sm:text-3xl">
                 {user?.name}
               </h1>
@@ -63,8 +66,8 @@ function DashboardPage() {
               <Flame className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-xs text-muted-foreground">Sequência</p>
-              <p className="font-display text-lg font-semibold leading-none">{data?.streakDays ?? 0} dias</p>
+              <p className="text-xs text-muted-foreground">Sessões seguidas</p>
+              <p className="font-display text-lg font-semibold leading-none">{data?.streakDays ?? 0}</p>
             </div>
           </div>
         </div>
@@ -87,7 +90,7 @@ function DashboardPage() {
             <StatCard label="Cursos" value={data?.coursesCount ?? 0} icon={BookOpen} hint="matriculados" />
             <StatCard label="Concluído" value={`${data?.overallProgress ?? 0}%`} icon={TrendingUp} accent="success" hint="progresso geral" />
             <StatCard label="Tempo estudado" value={formatMinutes(data?.studyMinutes ?? 0)} icon={Clock} accent="chart-2" />
-            <StatCard label="Sequência" value={`${data?.streakDays ?? 0} dias`} icon={Flame} accent="warning" hint="consecutivos" />
+            <StatCard label="Sessões seguidas" value={`${data?.streakDays ?? 0}`} icon={Flame} accent="warning" hint="agenda cumprida" />
           </>
         )}
       </section>
@@ -106,7 +109,13 @@ function DashboardPage() {
                     alt=""
                     className="h-full w-full object-cover"
                   />
-                ) : null}
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center">
+                    <span className="font-display text-7xl font-semibold text-primary-foreground/80">
+                      {(data.continueLesson.course.title || "C").trim().charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                )}
                 <div className="absolute inset-0 bg-gradient-to-r from-background via-background/70 to-transparent" />
               </div>
               <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-8">
@@ -137,9 +146,11 @@ function DashboardPage() {
             </div>
           ) : (
             <div className="flex h-64 flex-col items-center justify-center gap-3 p-8 text-center">
-              <p className="text-muted-foreground">Nenhum curso para continuar. Matricule-se e publique o EAD no painel.</p>
+              <p className="text-muted-foreground">
+                Nada para continuar agora. Quando a escola matricular você e publicar o curso, ele aparece aqui.
+              </p>
               <Button asChild variant="outline">
-                <Link to="/courses">Meus cursos</Link>
+                <Link to="/courses">Ver meus cursos</Link>
               </Button>
             </div>
           )}
@@ -157,16 +168,25 @@ function DashboardPage() {
           <div className="space-y-3">
             {isLoading
               ? Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-14 rounded-lg" />)
-              : data?.notifications.map((n) => (
-                  <div key={n.id} className="flex items-start gap-3 rounded-lg border border-border/50 p-3 transition-colors hover:bg-accent/40">
-                    <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${n.read ? "bg-muted" : "bg-primary"}`} />
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium">{n.title}</p>
-                      <p className="line-clamp-1 text-xs text-muted-foreground">{n.message}</p>
-                      <p className="mt-1 text-[10px] uppercase tracking-wider text-muted-foreground">{relativeTime(n.createdAt)}</p>
+              : !prefs.enabled
+                ? (
+                  <p className="text-sm text-muted-foreground">
+                    Notificações desativadas.{" "}
+                    <Link to="/settings" className="text-primary hover:underline">Ativar</Link>
+                  </p>
+                )
+                : !dashNotifs.length
+                  ? <p className="text-sm text-muted-foreground">Nenhuma notificação nova.</p>
+                  : dashNotifs.map((n) => (
+                    <div key={n.id} className="flex items-start gap-3 rounded-lg border border-border/50 p-3 transition-colors hover:bg-accent/40">
+                      <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${n.read ? "bg-muted" : "bg-primary"}`} />
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-medium">{n.title}</p>
+                        <p className="line-clamp-1 text-xs text-muted-foreground">{n.message}</p>
+                        <p className="mt-1 text-[10px] uppercase tracking-wider text-muted-foreground">{relativeTime(n.createdAt)}</p>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
           </div>
         </Card>
       </section>
@@ -218,10 +238,12 @@ function DashboardPage() {
         <Card className="p-6 lg:col-span-2">
           <div className="mb-4 flex items-center justify-between">
             <h3 className="font-medium">Conquistas</h3>
-            <Trophy className="h-4 w-4 text-muted-foreground" />
+            <Link to="/achievements" className="text-xs text-primary hover:underline">
+              Ver todas
+            </Link>
           </div>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-            {data?.achievements.slice(0, 6).map((a) => {
+            {(data?.achievements ?? []).slice(0, 6).map((a) => {
               const IconComp = (Icons as unknown as Record<string, Icons.LucideIcon>)[a.icon] ?? Icons.Award;
               const unlocked = !!a.unlockedAt;
               return (
@@ -232,9 +254,16 @@ function DashboardPage() {
                   }`}
                 >
                   <div className={`grid h-9 w-9 place-items-center rounded-lg ${unlocked ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground"}`}>
-                    <IconComp className="h-4 w-4" />
+                    {a.badgeUrl ? (
+                      <img src={a.badgeUrl} alt="" className="h-7 w-7 object-contain" />
+                    ) : (
+                      <IconComp className="h-4 w-4" />
+                    )}
                   </div>
-                  <p className="mt-2 truncate text-sm font-medium">{a.title}</p>
+                  {a.subtitle ? (
+                    <p className="mt-2 truncate text-[10px] uppercase tracking-wider text-primary/70">{a.subtitle}</p>
+                  ) : null}
+                  <p className="mt-1 truncate text-sm font-medium">{a.title}</p>
                   <p className="line-clamp-1 text-xs text-muted-foreground">{a.description}</p>
                   {!unlocked && a.progress != null && a.goal && (
                     <Progress value={(a.progress / a.goal) * 100} className="mt-2 h-1" />
@@ -277,6 +306,7 @@ function DashboardPage() {
                   <p className="truncate text-sm font-medium">
                     {r.name} {r.isCurrentUser && <span className="text-xs text-primary">(você)</span>}
                   </p>
+                  {r.city ? <p className="truncate text-xs text-muted-foreground">{r.city}</p> : null}
                 </div>
                 <p className="shrink-0 text-sm font-medium">{r.xp.toLocaleString("pt-BR")} XP</p>
               </div>

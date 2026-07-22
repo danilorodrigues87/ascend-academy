@@ -13,10 +13,12 @@ export function InlineRoleplay({
   scenarioId,
   courseId,
   onDone,
+  onAdvance,
 }: {
   scenarioId: string;
   courseId: string;
   onDone: () => void;
+  onAdvance?: () => void;
 }) {
   const { data: scenario, isLoading } = useQuery({
     queryKey: ["roleplay:scenario", scenarioId],
@@ -86,7 +88,8 @@ export function InlineRoleplay({
       const done = await rolePlayService.finishSimulation(sim.id);
       setSim(done);
       setRemaining(0);
-      toast.success(`Role play finalizado: ${done.score ?? 0}%`);
+      const xpPart = done.xpEarned ? ` · +${done.xpEarned} XP` : "";
+      toast.success(`Role play finalizado: ${done.score ?? 0}%${xpPart}`);
       onDone();
     } catch {
       toast.error("Não foi possível finalizar.");
@@ -124,7 +127,13 @@ export function InlineRoleplay({
       <Card className="space-y-4 p-6">
         <h2 className="font-display text-xl font-semibold">Resultado — {scenario.title}</h2>
         <p className="font-display text-4xl font-semibold">{sim.score ?? 0}%</p>
+        {sim.xpEarned != null && sim.xpEarned > 0 && (
+          <p className="text-sm font-medium text-primary">+{sim.xpEarned} XP</p>
+        )}
         <p className="text-sm text-muted-foreground">{sim.evaluation?.summary}</p>
+        {sim.needsRewatch && (
+          <p className="text-sm text-amber-600">Média da unidade abaixo de 70%. Reassine a aula para novo ciclo.</p>
+        )}
         {sim.evaluation?.strengths?.length ? (
           <div>
             <p className="text-xs font-medium uppercase text-muted-foreground">Pontos fortes</p>
@@ -135,6 +144,9 @@ export function InlineRoleplay({
             </ul>
           </div>
         ) : null}
+        {onAdvance && !sim.needsRewatch && (
+          <Button onClick={onAdvance}>Próximo</Button>
+        )}
       </Card>
     );
   }

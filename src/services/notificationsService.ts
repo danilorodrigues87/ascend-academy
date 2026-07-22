@@ -4,13 +4,28 @@ import { mockCertificates, mockNotifications } from "./mocks/data";
 
 export const notificationsService = {
   async list(): Promise<Notification[]> {
-    // Ainda sem endpoint no painel — mock
+    if (USE_API) {
+      return http.get<Notification[]>("/notifications");
+    }
     await delay(250);
     return structuredClone(mockNotifications);
   },
   async markAllRead(): Promise<void> {
+    if (USE_API) {
+      await http.post<{ ok: true }>("/notifications/mark-all-read", {});
+      return;
+    }
     await delay(150);
     mockNotifications.forEach((n) => (n.read = true));
+  },
+  async markRead(id: string): Promise<void> {
+    if (USE_API) {
+      await http.post<{ ok: true }>(`/notifications/${encodeURIComponent(id)}/read`, {});
+      return;
+    }
+    await delay(100);
+    const n = mockNotifications.find((x) => x.id === id);
+    if (n) n.read = true;
   },
 };
 

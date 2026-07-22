@@ -1,0 +1,209 @@
+﻿node.exe : npm warn Unknown env config "devdir". This will stop working in the next major version of npm. See `npm 
+help npmrc` for supported config options.
+No linha:1 caractere:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (npm warn Unknow...config options.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+> build
+> vite build
+
+The plugin "vite-tsconfig-paths" is detected. Vite now supports tsconfig paths resolution natively via the 
+resolve.tsconfigPaths option. You can remove the plugin and set resolve.tsconfigPaths: true in your Vite config 
+instead.
+The plugin "vite-tsconfig-paths" is detected. Vite now supports tsconfig paths resolution natively via the 
+resolve.tsconfigPaths option. You can remove the plugin and set resolve.tsconfigPaths: true in your Vite config 
+instead.
+The plugin "vite-tsconfig-paths" is detected. Vite now supports tsconfig paths resolution natively via the 
+resolve.tsconfigPaths option. You can remove the plugin and set resolve.tsconfigPaths: true in your Vite config 
+instead.
+vite v8.1.5 building client environment for production...
+[2K
+transforming...Ô£ô 2045 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/client/assets/styles-xS2r7Aku.css                                   107.21 kB Ôöé gzip:  17.36 kB
+dist/client/assets/_app.courses._courseId.index-DJ7LAi8J.js                0.03 kB Ôöé gzip:   0.05 kB
+dist/client/assets/routes-DJ7LAi8J.js                                      0.03 kB Ôöé gzip:   0.05 kB
+dist/client/assets/circle-DSMw184M.js                                      0.13 kB Ôöé gzip:   0.13 kB
+dist/client/assets/dist-ClUV1eFf.js                                        0.13 kB Ôöé gzip:   0.13 kB
+dist/client/assets/_app.courses-Vy44ytEy.js                                0.14 kB Ôöé gzip:   0.13 kB
+dist/client/assets/_app.courses._courseId-Vy44ytEy.js                      0.14 kB Ôöé gzip:   0.13 kB
+dist/client/assets/arrow-left-u84zHv43.js                                  0.16 kB Ôöé gzip:   0.16 kB
+dist/client/assets/arrow-right-BjrPdcli.js                                 0.16 kB Ôöé gzip:   0.16 kB
+dist/client/assets/clock-BoRxUZtc.js                                       0.16 kB Ôöé gzip:   0.16 kB
+dist/client/assets/search-BnXs40GX.js                                      0.17 kB Ôöé gzip:   0.17 kB
+dist/client/assets/circle-check-BjRRRODm.js                                0.17 kB Ôöé gzip:   0.16 kB
+dist/client/assets/dist-ByCQDXdM.js                                        0.19 kB Ôöé gzip:   0.17 kB
+dist/client/assets/useNavigate-K3rkWkZK.js                                 0.22 kB Ôöé gzip:   0.18 kB
+dist/client/assets/skeleton-C6lPrc1u.js                                    0.22 kB Ôöé gzip:   0.19 kB
+dist/client/assets/target-Bk3lkpTn.js                                      0.22 kB Ôöé gzip:   0.16 kB
+dist/client/assets/download-GUmCpNPL.js                                    0.23 kB Ôöé gzip:   0.19 kB
+dist/client/assets/message-square-CaKgxlGo.js                              0.23 kB Ôöé gzip:   0.20 kB
+dist/client/assets/circle-play-Ccf7zCv2.js                                 0.25 kB Ôöé gzip:   0.21 kB
+dist/client/assets/eye-Dj4bgWxK.js                                         0.25 kB Ôöé gzip:   0.20 kB
+dist/client/assets/award-MSbGY8dP.js                                       0.27 kB Ôöé gzip:   0.22 kB
+dist/client/assets/book-open-IR3ZFn6B.js                                   0.27 kB Ôöé gzip:   0.20 kB
+dist/client/assets/list-checks-Cv9wuQki.js                                 0.27 kB Ôöé gzip:   0.18 kB
+dist/client/assets/mail-check-Bxih5lwW.js                                  0.28 kB Ôöé gzip:   0.22 kB
+dist/client/assets/bell-C6K6qnh8.js                                        0.29 kB Ôöé gzip:   0.23 kB
+dist/client/assets/send-P5hs4gcH.js                                        0.29 kB Ôöé gzip:   0.23 kB
+dist/client/assets/refresh-cw-DjgBKo-Y.js                                  0.32 kB Ôöé gzip:   0.22 kB
+dist/client/assets/notificationsService-HvAwevZk.js                        0.32 kB Ôöé gzip:   0.23 kB
+dist/client/assets/info-BALk29Dt.js                                        0.33 kB Ôöé gzip:   0.24 kB
+dist/client/assets/camera-AmAOEVSE.js                                      0.33 kB Ôöé gzip:   0.25 kB
+dist/client/assets/eye-off-jA0f44Tf.js                                     0.43 kB Ôöé gzip:   0.27 kB
+dist/client/assets/users-DAtQMKgz.js                                       0.45 kB Ôöé gzip:   0.29 kB
+dist/client/assets/trophy-B3IkAFdC.js                                      0.47 kB Ôöé gzip:   0.27 kB
+dist/client/assets/sparkles-BgxWFEV8.js                                    0.49 kB Ôöé gzip:   0.28 kB
+dist/client/assets/textarea-BDZiZbsj.js                                    0.51 kB Ôöé gzip:   0.35 kB
+dist/client/assets/format-CH5P-Hnr.js                                      0.52 kB Ôöé gzip:   0.33 kB
+dist/client/assets/dist-DVLgA-9k.js                                        0.55 kB Ôöé gzip:   0.36 kB
+dist/client/assets/dist-B-1vYawf.js                                        0.59 kB Ôöé gzip:   0.41 kB
+dist/client/assets/Logo-Cs5tnSAk.js                                        0.60 kB Ôöé gzip:   0.37 kB
+dist/client/assets/input-BM11SITx.js                                       0.62 kB Ôöé gzip:   0.38 kB
+dist/client/assets/useMatch-BOqw31_B.js                                    0.62 kB Ôöé gzip:   0.39 kB
+dist/client/assets/matchContext-CUR3OA_k.js                                0.66 kB Ôöé gzip:   0.40 kB
+dist/client/assets/label-DJLHIf-Q.js                                       0.71 kB Ôöé gzip:   0.46 kB
+dist/client/assets/badge-BNwHM-jk.js                                       0.80 kB Ôöé gzip:   0.42 kB
+dist/client/assets/aiService-C5GAKaOj.js                                   1.00 kB Ôöé gzip:   0.49 kB
+dist/client/assets/card-DC_aq5HO.js                                        1.03 kB Ôöé gzip:   0.38 kB
+dist/client/assets/dist-zCcKVltv.js                                        1.07 kB Ôöé gzip:   0.57 kB
+dist/client/assets/createLucideIcon-DRtK7t0W.js                            1.20 kB Ôöé gzip:   0.69 kB
+dist/client/assets/timer-reset-BCbQYBQP.js                                 1.22 kB Ôöé gzip:   0.60 kB
+dist/client/assets/http-BwSK4cdC.js                                        1.41 kB Ôöé gzip:   0.83 kB
+dist/client/assets/assessmentsService-DCWTzHJo.js                          1.56 kB Ôöé gzip:   0.71 kB
+dist/client/assets/authService-B94gpr8l.js                                 1.71 kB Ôöé gzip:   0.79 kB
+dist/client/assets/button-Do8LGpD6.js                                      1.89 kB Ôöé gzip:   0.93 kB
+dist/client/assets/x-CZ3Gil7Z.js                                           1.89 kB Ôöé gzip:   0.77 kB
+dist/client/assets/square-CUuzA6TN.js                                      1.92 kB Ôöé gzip:   0.78 kB
+dist/client/assets/_app.courses.index-d3kGPVsa.js                          2.27 kB Ôöé gzip:   1.08 kB
+dist/client/assets/progress--zpMnkAE.js                                    2.28 kB Ôöé gzip:   1.11 kB
+dist/client/assets/useMutation-CWanX_lG.js                                 2.29 kB Ôöé gzip:   0.96 kB
+dist/client/assets/wand-sparkles-DF0piAFs.js                               2.43 kB Ôöé gzip:   1.01 kB
+dist/client/assets/_app.notifications-Bq9rJ0E-.js                          2.52 kB Ôöé gzip:   1.10 kB
+dist/client/assets/forgot-password-MYYvjIU0.js                             2.53 kB Ôöé gzip:   1.04 kB
+dist/client/assets/dist-BJg6M8Rx.js                                        2.55 kB Ôöé gzip:   1.19 kB
+dist/client/assets/_app.ranking-DBuMdgKB.js                                2.56 kB Ôöé gzip:   1.08 kB
+dist/client/assets/avatar-CO_6mDS1.js                                      2.62 kB Ôöé gzip:   1.13 kB
+dist/client/assets/first-access-B0EnuZ2l.js                                2.78 kB Ôöé gzip:   1.16 kB
+dist/client/assets/_app.certificates-C0b5spMs.js                           2.86 kB Ôöé gzip:   1.09 kB
+dist/client/assets/dist-B5rmyWsl.js                                        2.88 kB Ôöé gzip:   1.26 kB
+dist/client/assets/_app.continue-D6znX0ok.js                               2.94 kB Ôöé gzip:   1.20 kB
+dist/client/assets/react-dom-CQmWuZA8.js                                   3.54 kB Ôöé gzip:   1.34 kB
+dist/client/assets/tabs-Ckel4buA.js                                        3.61 kB Ôöé gzip:   1.50 kB
+dist/client/assets/link-DxNlzXeP.js                                        4.38 kB Ôöé gzip:   2.16 kB
+dist/client/assets/CourseCard-C2QupVbZ.js                                  4.69 kB Ôöé gzip:   1.70 kB
+dist/client/assets/_app.profile-CXV3sw5c.js                                4.77 kB Ôöé gzip:   1.78 kB
+dist/client/assets/preload-helper-B31KGKxK.js                              5.29 kB Ôöé gzip:   1.97 kB
+dist/client/assets/login-CSv7gUaz.js                                       5.32 kB Ôöé gzip:   2.04 kB
+dist/client/assets/dist-BgS0QiwW.js                                        5.34 kB Ôöé gzip:   2.23 kB
+dist/client/assets/_app.ai-Di_cJBvd.js                                     6.61 kB Ôöé gzip:   2.51 kB
+dist/client/assets/_app.settings--9F3YX8o.js                               6.89 kB Ôöé gzip:   2.57 kB
+dist/client/assets/_app.roleplay-f1U659UH.js                               6.93 kB Ôöé gzip:   2.24 kB
+dist/client/assets/rolePlayService-F0oHh10S.js                             8.15 kB Ôöé gzip:   3.05 kB
+dist/client/assets/jsx-runtime-n5LQ9ujS.js                                 8.53 kB Ôöé gzip:   3.26 kB
+dist/client/assets/useQuery-DR6c2fIS.js                                    8.80 kB Ôöé gzip:   3.21 kB
+dist/client/assets/data-Bz8D1pSc.js                                       10.58 kB Ôöé gzip:   3.91 kB
+dist/client/assets/_app.assessments-BqJLY4Qv.js                           13.25 kB Ôöé gzip:   4.45 kB
+dist/client/assets/QueryClientProvider-DwN2x3cj.js                        15.25 kB Ôöé gzip:   5.26 kB
+dist/client/assets/useStore-CQo-MNEv.js                                   19.18 kB Ôöé gzip:   6.90 kB
+dist/client/assets/_app.roleplay._simulationId-5bsSd0PV.js                23.54 kB Ôöé gzip:   6.73 kB
+dist/client/assets/_app.courses._courseId.lessons._lessonId-_jL57Rre.js   27.20 kB Ôöé gzip:   7.98 kB
+dist/client/assets/utils-lp4SDbGI.js                                      29.74 kB Ôöé gzip:   9.69 kB
+dist/client/assets/Match-Cwr3sq-e.js                                      48.64 kB Ôöé gzip:  15.78 kB
+dist/client/assets/_app-BK24cIwu.js                                       82.62 kB Ôöé gzip:  27.17 kB
+dist/client/assets/index-DR3Y58Fk.js                                     287.36 kB Ôöé gzip:  89.30 kB
+dist/client/assets/_app.dashboard-DjuBUt3u.js                            602.05 kB Ôöé gzip: 151.30 kB
+
+[33m[PLUGIN_TIMINGS] [0mYour build spent significant time in plugins. Here is a breakdown:
+  - vite-tsconfig-paths (52%)
+  - tanstack-start-core:import-protection-transform-cache (30%)
+  - tanstack-start-core:import-protection (17%)
+See https://rolldown.rs/reference/InputOptions.checks#plugintimings for more details.
+
+[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: 
+https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+Ô£ô built in 3.12s
+vite v8.1.5 building ssr environment for production...
+[2K
+transforming...Ô£ô 140 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/server/assets/routes-DTEZEvkE.js                                     0.13 kB Ôöé gzip:  0.12 kB
+dist/server/assets/utils-C_uf36nf.js                                      0.18 kB Ôöé gzip:  0.15 kB
+dist/server/assets/_app.courses._courseId.index-D23FcVb-.js               0.21 kB Ôöé gzip:  0.18 kB
+dist/server/assets/empty-plugin-adapters-D9UWiqvJ.js                      0.22 kB Ôöé gzip:  0.16 kB
+dist/server/assets/_app.courses-BcClfPW3.js                               0.33 kB Ôöé gzip:  0.24 kB
+dist/server/assets/skeleton-D9W9wFsj.js                                   0.33 kB Ôöé gzip:  0.25 kB
+dist/server/assets/_app.courses._courseId-Bv90pUsv.js                     0.34 kB Ôöé gzip:  0.25 kB
+dist/server/assets/_app.roleplay._simulationId-C79SHcRB.js                0.46 kB Ôöé gzip:  0.30 kB
+dist/server/assets/continueLesson-VGpi5kJW.js                             0.61 kB Ôöé gzip:  0.34 kB
+dist/server/assets/_app.courses._courseId.lessons._lessonId-xqbt9q1q.js   0.62 kB Ôöé gzip:  0.38 kB
+dist/server/assets/label-DBD1bRRP.js                                      0.64 kB Ôöé gzip:  0.38 kB
+dist/server/assets/notificationsService-CX9rDGAl.js                       0.65 kB Ôöé gzip:  0.33 kB
+dist/server/assets/textarea-kko37XEX.js                                   0.66 kB Ôöé gzip:  0.42 kB
+dist/server/assets/progress-DOIEKRJF.js                                   0.74 kB Ôöé gzip:  0.43 kB
+dist/server/assets/input-B8Q2ztVi.js                                      0.75 kB Ôöé gzip:  0.45 kB
+dist/server/assets/Logo-2ZONwr81.js                                       0.80 kB Ôöé gzip:  0.44 kB
+dist/server/assets/createMiddleware-B_4t7rW1.js                           0.83 kB Ôöé gzip:  0.32 kB
+dist/server/assets/format-BkgF6Xya.js                                     0.87 kB Ôöé gzip:  0.45 kB
+dist/server/assets/badge-D1Dupn2y.js                                      0.98 kB Ôöé gzip:  0.50 kB
+dist/server/assets/ThemeContext-QMQ0j3Uz.js                               1.02 kB Ôöé gzip:  0.51 kB
+dist/server/assets/avatar-gunzrkKA.js                                     1.13 kB Ôöé gzip:  0.44 kB
+dist/server/assets/start-DK-ph67u.js                                      1.43 kB Ôöé gzip:  0.66 kB
+dist/server/assets/card-CzXpCsbD.js                                       1.50 kB Ôöé gzip:  0.46 kB
+dist/server/assets/AuthContext-CircMeOe.js                                1.51 kB Ôöé gzip:  0.62 kB
+dist/server/assets/tabs-CCJRliUM.js                                       1.63 kB Ôöé gzip:  0.60 kB
+dist/server/assets/button-Bq5vK6RO.js                                     1.65 kB Ôöé gzip:  0.77 kB
+dist/server/assets/aiService-C2ZiGVuj.js                                  1.67 kB Ôöé gzip:  0.64 kB
+dist/server/assets/assessmentsService-CKrEKrHt.js                         2.45 kB Ôöé gzip:  0.86 kB
+dist/server/assets/http-C4lrvgT7.js                                       2.57 kB Ôöé gzip:  1.19 kB
+dist/server/assets/coursesService-BPHY5F_A.js                             2.68 kB Ôöé gzip:  0.93 kB
+dist/server/assets/authService-DIQHrnYF.js                                2.95 kB Ôöé gzip:  1.06 kB
+dist/server/assets/_app.notifications-CpQ2Xpnu.js                         3.38 kB Ôöé gzip:  1.29 kB
+dist/server/server.js                                                     3.41 kB Ôöé gzip:  1.46 kB
+dist/server/assets/_app.courses.index-vbxntU9h.js                         3.45 kB Ôöé gzip:  1.34 kB
+dist/server/assets/_app.ranking-BXtOpSgC.js                               3.67 kB Ôöé gzip:  1.34 kB
+dist/server/assets/forgot-password-BJkhh5VA.js                            3.86 kB Ôöé gzip:  1.30 kB
+dist/server/assets/_app.certificates-P0cRUuYG.js                          4.03 kB Ôöé gzip:  1.32 kB
+dist/server/assets/_app.continue-CIs960cc.js                              4.54 kB Ôöé gzip:  1.51 kB
+dist/server/assets/first-access-B8uFYp16.js                               4.57 kB Ôöé gzip:  1.45 kB
+dist/server/assets/_app.settings-BWqAeS2W.js                              5.00 kB Ôöé gzip:  1.54 kB
+dist/server/assets/CourseCard-hBq-YhYx.js                                 5.80 kB Ôöé gzip:  1.66 kB
+dist/server/assets/_app.profile-Du-W70JQ.js                               7.57 kB Ôöé gzip:  2.19 kB
+dist/server/assets/login-B6BoxCaJ.js                                      8.01 kB Ôöé gzip:  2.47 kB
+dist/server/assets/_app.ai-m5yv8P2y.js                                    9.48 kB Ôöé gzip:  2.99 kB
+dist/server/assets/_tanstack-start-manifest_v-G0K-LYnz.js                10.05 kB Ôöé gzip:  2.01 kB
+dist/server/assets/_app.roleplay-BnmYGY9c.js                             10.21 kB Ôöé gzip:  2.62 kB
+dist/server/assets/rolePlayService-B2OgQQEt.js                           10.32 kB Ôöé gzip:  3.38 kB
+dist/server/assets/_app.assessments-B0U9pPOq.js                          11.95 kB Ôöé gzip:  3.10 kB
+dist/server/assets/data-gIza-OcL.js                                      13.48 kB Ôöé gzip:  4.33 kB
+dist/server/assets/router-fW_su4Q8.js                                    16.93 kB Ôöé gzip:  4.08 kB
+dist/server/assets/_app.dashboard-BvlxDEpn.js                            17.43 kB Ôöé gzip:  3.97 kB
+dist/server/assets/_app-CNYfZaRn.js                                      31.11 kB Ôöé gzip:  7.08 kB
+dist/server/assets/_app.roleplay._simulationId-D86AjjAi.js               34.85 kB Ôöé gzip:  8.26 kB
+dist/server/assets/_app.courses._courseId.lessons._lessonId-Cf9C3H_P.js  42.43 kB Ôöé gzip: 10.06 kB
+dist/server/assets/server-COET4wMH.js                                    58.73 kB Ôöé gzip: 15.11 kB
+
+Ô£ô built in 1.79s
+The plugin "vite-tsconfig-paths" is detected. Vite now supports tsconfig paths resolution natively via the 
+resolve.tsconfigPaths option. You can remove the plugin and set resolve.tsconfigPaths: true in your Vite config 
+instead.
+[prerender] Prerendering pages...
+[prerender] Concurrency: 8
+[prerender] Crawling: /
+[prerender] Prerendered 1 pages:
+[prerender] - /
+npm notice
+npm notice New major version of npm available! 11.16.0 -> 12.0.1
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.0.1
+npm notice To update run: npm install -g npm@12.0.1
+npm notice
+EXIT_CODE=0

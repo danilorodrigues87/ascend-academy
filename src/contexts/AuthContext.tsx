@@ -7,6 +7,8 @@ interface AuthCtx {
   loading: boolean;
   login: (c: LoginCredentials) => Promise<void>;
   logout: () => Promise<void>;
+  refreshUser: () => Promise<User | null>;
+  setUser: (user: User) => void;
   isAuthenticated: boolean;
 }
 
@@ -37,6 +39,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setSession(null);
   }, []);
 
+  const refreshUser = useCallback(async () => {
+    const user = await authService.refreshUser();
+    setSession(authService.getSession());
+    return user;
+  }, []);
+
+  const setUser = useCallback((user: User) => {
+    authService.patchUser(user);
+    setSession(authService.getSession());
+  }, []);
+
   return (
     <Ctx.Provider
       value={{
@@ -44,6 +57,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         loading,
         login,
         logout,
+        refreshUser,
+        setUser,
         isAuthenticated: !!session,
       }}
     >

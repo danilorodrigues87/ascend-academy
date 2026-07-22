@@ -14,8 +14,8 @@ export const Route = createFileRoute("/login")({
   component: LoginPage,
   head: () => ({
     meta: [
-      { title: "Entrar — Aurora Portal do Aluno" },
-      { name: "description", content: "Acesse sua conta na plataforma Aurora EAD." },
+      { title: "Entrar — CTI Educacional" },
+      { name: "description", content: "Acesse sua conta no portal CTI Educacional." },
     ],
   }),
 });
@@ -168,9 +168,9 @@ function LoginPage() {
           </div>
 
           <p className="mt-8 text-center text-sm text-muted-foreground">
-            Primeiro acesso?{" "}
-            <Link to="/first-access" className="font-medium text-primary hover:underline">
-              Ativar minha conta
+            Problemas para entrar?{" "}
+            <Link to="/forgot-password" className="font-medium text-primary hover:underline">
+              Recuperar senha
             </Link>
           </p>
         </div>

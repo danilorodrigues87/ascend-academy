@@ -41,7 +41,7 @@ import { useAuth } from "@/contexts/AuthContext";
 
 export const Route = createFileRoute("/_app/roleplay/$simulationId")({
   component: RolePlayRunnerPage,
-  head: () => ({ meta: [{ title: "Simulação Prática — Aurora" }] }),
+  head: () => ({ meta: [{ title: "Simulação Prática — CTI Educacional" }] }),
 });
 
 const difficultyLabel: Record<RolePlayDifficulty, string> = {

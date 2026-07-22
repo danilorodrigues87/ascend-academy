@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { coursesService, aiService } from "@/services";
+import { authService } from "@/services/authService";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -21,17 +22,21 @@ import {
   PanelRightClose,
   PanelRightOpen,
   PlayCircle,
+  RefreshCw,
   Send,
   Sparkles,
   Square,
+  Trash2,
 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { formatMinutes } from "@/utils/format";
 import { youtubeEmbedSrc } from "@/utils/youtube";
-import type { Course, CurriculumItem, Lesson } from "@/types";
+import type { AccessWindow, Course, CurriculumItem, Lesson, LessonComment } from "@/types";
 import { InlineAssessment } from "@/components/course/InlineAssessment";
 import { InlineRoleplay } from "@/components/course/InlineRoleplay";
+import { CourseRatingControl } from "@/components/common/CourseRating";
+import { useAuth } from "@/contexts/AuthContext";
 
 type Search = { panel?: "content" | "ai"; item?: string };
 
@@ -41,7 +46,7 @@ export const Route = createFileRoute("/_app/courses/$courseId/lessons/$lessonId"
     item: typeof s.item === "string" ? s.item : undefined,
   }),
   component: LessonPage,
-  head: () => ({ meta: [{ title: "Aula â€” CTI Educacional" }] }),
+  head: () => ({ meta: [{ title: "Aula — CTI Educacional" }] }),
 });
 
 function LessonPage() {
@@ -49,6 +54,7 @@ function LessonPage() {
   const search = Route.useSearch();
   const navigate = useNavigate();
   const qc = useQueryClient();
+  const { refreshUser } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [sideTab, setSideTab] = useState<"content" | "ai">(search.panel === "ai" ? "ai" : "content");
 
@@ -76,6 +82,10 @@ function LessonPage() {
       qc.invalidateQueries({ queryKey: ["courses"] });
       qc.invalidateQueries({ queryKey: ["dashboard"] });
       qc.invalidateQueries({ queryKey: ["ranking"] });
+      void refreshUser();
+    },
+    onError: (e: Error) => {
+      toast.error(e.message || "Não foi possível concluir a aula.");
     },
   });
 
@@ -119,8 +129,8 @@ function LessonPage() {
   if (isError || !data) {
     return (
       <div className="space-y-3 p-8">
-        <p className="text-muted-foreground">NÃ£o foi possÃ­vel carregar a aula.</p>
-        <p className="text-xs text-muted-foreground">Curso {courseId} Â· Aula {lessonId}</p>
+        <p className="text-muted-foreground">Não foi possível carregar a aula.</p>
+        <p className="text-xs text-muted-foreground">Curso {courseId} · Aula {lessonId}</p>
         <Button asChild variant="outline">
           <Link to="/courses">Voltar aos cursos</Link>
         </Button>
@@ -129,9 +139,14 @@ function LessonPage() {
   }
 
   const { course, lesson } = data;
+  const accessWindow = (data as { accessWindow?: AccessWindow }).accessWindow ?? course.accessWindow;
+  const contentLocked = !!lesson.locked && !lesson.completed;
 
   const goItem = (item: CurriculumItem) => {
-    if (item.locked) return;
+    if (item.locked) {
+      if (item.lockMessage) toast.message(item.lockMessage);
+      return;
+    }
     if (item.kind === "lesson") {
       navigate({
         to: "/courses/$courseId/lessons/$lessonId",
@@ -159,27 +174,93 @@ function LessonPage() {
           </Link>
           <Button variant="ghost" size="sm" onClick={() => setSidebarOpen((v) => !v)} className="gap-1">
             {sidebarOpen ? <PanelRightClose className="h-4 w-4" /> : <PanelRightOpen className="h-4 w-4" />}
-            {sidebarOpen ? "Ocultar" : "ConteÃºdo"}
+            {sidebarOpen ? "Ocultar" : "Conteúdo"}
           </Button>
         </div>
 
-        {activeItem.kind === "lesson" && (
+        {accessWindow && (
+          <div
+            className={`rounded-xl border px-4 py-3 text-sm ${
+              accessWindow.active
+                ? "border-emerald-500/30 bg-emerald-500/10 text-foreground"
+                : "border-amber-500/30 bg-amber-500/10 text-foreground"
+            }`}
+          >
+            <p className="font-medium">{accessWindow.active ? "Sessão de estudos ativa" : "Fora do horário agendado"}</p>
+            <p className="mt-1 text-muted-foreground">{accessWindow.message}</p>
+            {accessWindow.active && (
+              <p className="mt-1 text-xs text-muted-foreground">
+                Cota: {accessWindow.quotaUsed}/{accessWindow.quotaMax} aulas novas usadas nesta sessão
+                {accessWindow.quotaRemaining > 0 ? ` · restam ${accessWindow.quotaRemaining}` : ""}.
+              </p>
+            )}
+          </div>
+        )}
+
+        {lesson.needsRewatch && (
+          <div className="rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm">
+            <p className="font-medium text-amber-800 dark:text-amber-200">Reassinatura necessária</p>
+            <p className="mt-1 text-muted-foreground">
+              A média da unidade{lesson.unitScore != null ? ` ficou em ${Math.round(lesson.unitScore)}%` : ""} (mínimo 70%).
+              Assista esta aula novamente para liberar um novo ciclo de tentativas nas atividades e no role play.
+            </p>
+          </div>
+        )}
+
+        {!lesson.needsRewatch && lesson.unitScore != null && (
+          <div className="rounded-xl border border-border/60 bg-muted/30 px-4 py-2 text-xs text-muted-foreground">
+            Média da unidade (atividades + role play):{" "}
+            <span className={lesson.unitPassed ? "font-medium text-emerald-600" : "font-medium text-foreground"}>
+              {Math.round(lesson.unitScore)}%
+            </span>
+            {lesson.unitPassed ? " · aprovada" : ""}
+            {lesson.cycle != null && lesson.cycle > 1 ? ` · ciclo ${lesson.cycle}` : ""}
+          </div>
+        )}
+
+        {activeItem.kind === "lesson" && contentLocked && (
+          <Card className="space-y-3 border-amber-500/40 p-6">
+            <div className="flex items-start gap-3">
+              <Lock className="mt-0.5 h-5 w-5 text-amber-600" />
+              <div>
+                <h2 className="font-display text-xl font-semibold">{lesson.title}</h2>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  {lesson.lockMessage || accessWindow?.message || "Esta aula ainda não está liberada."}
+                </p>
+                <p className="mt-2 text-xs text-muted-foreground">
+                  Você pode revisar aulas já concluídas a qualquer momento.
+                </p>
+              </div>
+            </div>
+          </Card>
+        )}
+
+        {activeItem.kind === "lesson" && !contentLocked && (
           <>
-            <VideoPlayer lesson={lesson} />
+          <VideoPlayer lesson={lesson} courseId={courseId} />
             <div>
               <h1 className="font-display text-2xl font-semibold md:text-3xl">{lesson.title}</h1>
               <p className="mt-1 text-sm text-muted-foreground">
-                {formatMinutes(lesson.durationMinutes)} Â· {course.title}
+                {formatMinutes(lesson.durationMinutes)} · {course.title}
               </p>
+              {(course.progressPercent ?? 0) >= 20 && (
+                <div className="mt-3">
+                  <CourseRatingControl course={course} />
+                </div>
+              )}
             </div>
             <div className="flex flex-wrap items-center gap-2">
-              <Button onClick={() => complete.mutate()} disabled={lesson.completed || complete.isPending} className="gap-2">
+              <Button
+                onClick={() => complete.mutate()}
+                disabled={lesson.completed || lesson.locked || complete.isPending}
+                className="gap-2"
+              >
                 <CheckCircle2 className="h-4 w-4" />
-                {lesson.completed ? "ConcluÃ­da" : "Marcar como concluÃ­da"}
+                {lesson.completed ? "Concluída" : "Marcar como concluída"}
               </Button>
               {next && (
                 <Button variant="outline" className="gap-2" onClick={() => goItem(next)}>
-                  PrÃ³ximo <ArrowRight className="h-4 w-4" />
+                  Próximo <ArrowRight className="h-4 w-4" />
                 </Button>
               )}
             </div>
@@ -187,11 +268,17 @@ function LessonPage() {
         )}
 
         {activeItem.kind === "assessment" && (
-          <InlineAssessment courseId={course.id} assessmentId={activeItem.id} onBack={() => navigate({
-            to: "/courses/$courseId/lessons/$lessonId",
-            params: { courseId: course.id, lessonId },
-            search: { panel: sideTab },
-          })} />
+          <InlineAssessment
+            courseId={course.id}
+            lessonId={lessonId}
+            assessmentId={activeItem.id}
+            onBack={() => navigate({
+              to: "/courses/$courseId/lessons/$lessonId",
+              params: { courseId: course.id, lessonId },
+              search: { panel: sideTab },
+            })}
+            onAdvance={next ? () => goItem(next) : undefined}
+          />
         )}
 
         {activeItem.kind === "roleplay" && (
@@ -202,22 +289,24 @@ function LessonPage() {
               qc.invalidateQueries({ queryKey: ["course", course.id] });
               qc.invalidateQueries({ queryKey: ["lesson", courseId, lessonId] });
               qc.invalidateQueries({ queryKey: ["ranking"] });
+              void refreshUser();
             }}
+            onAdvance={next ? () => goItem(next) : undefined}
           />
         )}
 
         {activeItem.kind === "lesson" && (
           <Tabs defaultValue="about">
             <TabsList>
-              <TabsTrigger value="about">VisÃ£o geral</TabsTrigger>
+              <TabsTrigger value="about">Visão geral</TabsTrigger>
               <TabsTrigger value="resources">Materiais</TabsTrigger>
-              <TabsTrigger value="notes">AnotaÃ§Ãµes</TabsTrigger>
-              <TabsTrigger value="comments">ComentÃ¡rios</TabsTrigger>
+              <TabsTrigger value="notes">Anotações</TabsTrigger>
+              <TabsTrigger value="comments">Comentários</TabsTrigger>
             </TabsList>
             <TabsContent value="about" className="mt-4">
               <Card className="space-y-3 p-6 text-sm leading-relaxed text-muted-foreground">
                 <p className="font-display text-lg font-semibold text-foreground">{course.title}</p>
-                <p>{lesson.description || course.shortDescription || "Sem descriÃ§Ã£o."}</p>
+                <p>{lesson.description || course.shortDescription || "Sem descrição."}</p>
               </Card>
             </TabsContent>
             <TabsContent value="resources" className="mt-4">
@@ -238,7 +327,7 @@ function LessonPage() {
             <TabsContent value="notes" className="mt-4">
               <Card className="p-4">
                 <Textarea
-                  placeholder="Suas anotaÃ§Ãµes desta aula (salvamento automÃ¡tico)..."
+                  placeholder="Suas anotações desta aula (salvamento automático)..."
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   className="min-h-[180px] border-0 focus-visible:ring-0"
@@ -246,9 +335,7 @@ function LessonPage() {
               </Card>
             </TabsContent>
             <TabsContent value="comments" className="mt-4">
-              <Card className="p-8 text-center text-sm text-muted-foreground">
-                Em breve: comentÃ¡rios entre alunos e resposta do professor.
-              </Card>
+              <LessonComments courseId={courseId} lessonId={lessonId} />
             </TabsContent>
           </Tabs>
         )}
@@ -263,7 +350,7 @@ function LessonPage() {
                 onClick={() => setSideTab("content")}
                 className={`flex-1 px-3 py-3 text-sm font-medium ${sideTab === "content" ? "border-b-2 border-primary text-foreground" : "text-muted-foreground"}`}
               >
-                ConteÃºdo do curso
+                Conteúdo do curso
               </button>
               <button
                 type="button"
@@ -307,7 +394,7 @@ function CourseCurriculum({
       <div className="border-b border-border/60 p-4">
         <p className="text-xs uppercase tracking-wider text-muted-foreground">Curso</p>
         <p className="mt-1 truncate font-medium">{course.title}</p>
-        <p className="mt-1 text-xs text-muted-foreground">{course.progressPercent}% concluÃ­do</p>
+        <p className="mt-1 text-xs text-muted-foreground">{course.progressPercent}% concluído</p>
       </div>
       {course.modules.map((m, mi) => {
         const items: CurriculumItem[] =
@@ -329,12 +416,12 @@ function CourseCurriculum({
           <div key={m.id}>
             <div className="border-b border-border/40 bg-muted/30 px-4 py-2.5">
               <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                SeÃ§Ã£o {mi + 1} â€” {m.title}
+                Seção {mi + 1} — {m.title}
               </p>
               <p className="mt-1 text-[11px] text-muted-foreground">
-                {done} / {items.length} Â· {mins}m
-                {assessments > 0 ? ` Â· ${assessments} atividade(s)` : ""}
-                {roleplays > 0 ? ` Â· ${roleplays} role play` : ""}
+                {done} / {items.length} · {mins}m
+                {assessments > 0 ? ` · ${assessments} atividade(s)` : ""}
+                {roleplays > 0 ? ` · ${roleplays} role play` : ""}
               </p>
             </div>
             <ul>
@@ -354,6 +441,8 @@ function CourseCurriculum({
                     >
                       {it.locked ? (
                         <Lock className="h-3.5 w-3.5 shrink-0" />
+                      ) : it.needsRewatch ? (
+                        <RefreshCw className="h-3.5 w-3.5 shrink-0 text-amber-600" />
                       ) : it.completed ? (
                         <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-success" />
                       ) : it.kind === "assessment" ? (
@@ -363,7 +452,21 @@ function CourseCurriculum({
                       ) : (
                         <Square className="h-3.5 w-3.5 shrink-0" />
                       )}
-                      <span className="flex-1 truncate">{it.title}</span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate">{it.title}</span>
+                        {it.kind === "lesson" && it.needsRewatch && (
+                          <span className="block text-[10px] font-medium uppercase tracking-wide text-amber-600">
+                            Reassistir
+                            {it.unitScore != null ? ` · média ${Math.round(it.unitScore)}%` : ""}
+                          </span>
+                        )}
+                        {it.kind === "lesson" && !it.needsRewatch && it.unitScore != null && (
+                          <span className="block text-[10px] text-muted-foreground">
+                            Unidade {Math.round(it.unitScore)}%
+                            {it.unitPassed ? " · ok" : ""}
+                          </span>
+                        )}
+                      </span>
                       {it.kind !== "lesson" && (
                         <span className="shrink-0 rounded bg-primary/10 px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-primary">
                           {it.kind === "assessment" ? "Atividade" : "Role play"}
@@ -384,7 +487,7 @@ function CourseCurriculum({
   );
 }
 
-function VideoPlayer({ lesson }: { lesson: Lesson }) {
+function VideoPlayer({ lesson, courseId }: { lesson: Lesson; courseId: string }) {
   const videos = lesson.videos?.length
     ? lesson.videos
     : lesson.videoUrl
@@ -392,11 +495,59 @@ function VideoPlayer({ lesson }: { lesson: Lesson }) {
       : [];
   const [idx, setIdx] = useState(0);
   const current = videos[idx];
+  const sessionRef = useRef<number | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const { setUser } = useAuth();
+
+  const ping = useCallback(async (origin: "presence" | "youtube" | "private") => {
+    try {
+      const res = await coursesService.studyHeartbeat({
+        lessonId: lesson.id,
+        courseId,
+        sessionId: sessionRef.current,
+        origin,
+      });
+      if (res.sessionId != null) sessionRef.current = res.sessionId;
+      if (typeof res.totalMinutes === "number") {
+        const session = authService.getSession();
+        if (session?.user) {
+          setUser({ ...session.user, totalStudyMinutes: res.totalMinutes });
+        }
+      }
+    } catch {
+      // silencioso — não interrompe o player
+    }
+  }, [lesson.id, courseId, setUser]);
+
+  useEffect(() => {
+    sessionRef.current = null;
+    const tick = () => {
+      if (typeof document !== "undefined" && document.visibilityState !== "visible") return;
+      const provider = current?.provider || "youtube";
+      if (provider === "private") {
+        const el = videoRef.current;
+        if (!el || el.paused || el.ended) return;
+        void ping("private");
+        return;
+      }
+      void ping("presence");
+    };
+    tick();
+    const id = window.setInterval(tick, 30000);
+    const onVis = () => {
+      if (document.visibilityState === "visible") tick();
+    };
+    document.addEventListener("visibilitychange", onVis);
+    return () => {
+      window.clearInterval(id);
+      document.removeEventListener("visibilitychange", onVis);
+    };
+  }, [lesson.id, current?.id, current?.provider, ping]);
 
   if (!current) {
     return (
       <div className="flex aspect-video items-center justify-center rounded-2xl border border-dashed border-border/60 bg-muted/30 text-sm text-muted-foreground">
-        Esta aula nÃ£o tem vÃ­deo â€” confira a descriÃ§Ã£o e os materiais abaixo.
+        Esta aula não tem vídeo — confira a descrição e os materiais abaixo.
       </div>
     );
   }
@@ -416,10 +567,16 @@ function VideoPlayer({ lesson }: { lesson: Lesson }) {
             className="h-full w-full"
           />
         ) : provider === "private" ? (
-          <video src={current.url} controls className="h-full w-full" />
+          <video
+            ref={videoRef}
+            src={current.url}
+            controls
+            className="h-full w-full"
+            onPlay={() => void ping("private")}
+          />
         ) : (
           <div className="grid h-full place-items-center p-6 text-center text-sm text-white/80">
-            NÃ£o foi possÃ­vel carregar este vÃ­deo. Verifique o link no painel (cole o URL completo do YouTube).
+            Não foi possível carregar este vídeo. Verifique o link no painel (cole o URL completo do YouTube).
           </div>
         )}
       </div>
@@ -427,12 +584,141 @@ function VideoPlayer({ lesson }: { lesson: Lesson }) {
         <div className="flex flex-wrap gap-2">
           {videos.map((v, i) => (
             <Button key={v.id} size="sm" variant={i === idx ? "default" : "outline"} onClick={() => setIdx(i)} className="gap-1">
-              <PlayCircle className="h-3.5 w-3.5" /> {v.title || `VÃ­deo ${i + 1}`}
+              <PlayCircle className="h-3.5 w-3.5" /> {v.title || `Vídeo ${i + 1}`}
             </Button>
           ))}
         </div>
       )}
     </div>
+  );
+}
+
+function LessonComments({ courseId, lessonId }: { courseId: string; lessonId: string }) {
+  const { user } = useAuth();
+  const qc = useQueryClient();
+  const [text, setText] = useState("");
+  const [replyTo, setReplyTo] = useState<LessonComment | null>(null);
+
+  const { data: comments = [], isLoading } = useQuery({
+    queryKey: ["comments", courseId, lessonId],
+    queryFn: () => coursesService.listComments(courseId, lessonId),
+  });
+
+  const post = useMutation({
+    mutationFn: () => coursesService.postComment(courseId, lessonId, text.trim(), replyTo?.id),
+    onSuccess: () => {
+      setText("");
+      setReplyTo(null);
+      qc.invalidateQueries({ queryKey: ["comments", courseId, lessonId] });
+    },
+    onError: (e: Error) => toast.error(e.message || "Não foi possível comentar."),
+  });
+
+  const del = useMutation({
+    mutationFn: (id: string) => coursesService.deleteComment(courseId, lessonId, id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["comments", courseId, lessonId] }),
+    onError: (e: Error) => toast.error(e.message || "Não foi possível excluir."),
+  });
+
+  const roots = comments.filter((c) => !c.parentId);
+  const repliesOf = (id: string) => comments.filter((c) => c.parentId === id);
+
+  return (
+    <Card className="space-y-4 p-4 md:p-6">
+      <div className="space-y-2">
+        {replyTo && (
+          <p className="text-xs text-muted-foreground">
+            Respondendo a {replyTo.authorName}.{" "}
+            <button type="button" className="underline" onClick={() => setReplyTo(null)}>
+              Cancelar
+            </button>
+          </p>
+        )}
+        <Textarea
+          placeholder="Escreva um comentário para a turma…"
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          className="min-h-[90px]"
+          maxLength={2000}
+        />
+        <div className="flex justify-end">
+          <Button
+            size="sm"
+            disabled={!text.trim() || post.isPending}
+            onClick={() => post.mutate()}
+            className="gap-1"
+          >
+            <Send className="h-3.5 w-3.5" /> Comentar
+          </Button>
+        </div>
+      </div>
+
+      {isLoading ? (
+        <p className="text-sm text-muted-foreground">Carregando comentários…</p>
+      ) : roots.length === 0 ? (
+        <p className="text-sm text-muted-foreground">Nenhum comentário ainda. Seja o primeiro!</p>
+      ) : (
+        <ul className="space-y-4">
+          {roots.map((c) => (
+            <li key={c.id} className="border-b border-border/40 pb-3 last:border-0">
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <p className="text-sm font-medium">
+                    {c.authorName}
+                    {c.authorType === "staff" && (
+                      <span className="ml-2 rounded bg-primary/10 px-1.5 py-0.5 text-[10px] uppercase text-primary">
+                        Equipe
+                      </span>
+                    )}
+                  </p>
+                  <p className="mt-1 text-sm text-muted-foreground whitespace-pre-wrap">{c.text}</p>
+                  <div className="mt-2 flex gap-3 text-xs">
+                    <button type="button" className="text-primary hover:underline" onClick={() => setReplyTo(c)}>
+                      Responder
+                    </button>
+                    {user?.id === c.authorId && (
+                      <button
+                        type="button"
+                        className="inline-flex items-center gap-1 text-destructive hover:underline"
+                        onClick={() => del.mutate(c.id)}
+                      >
+                        <Trash2 className="h-3 w-3" /> Excluir
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+              {repliesOf(c.id).length > 0 && (
+                <ul className="mt-3 space-y-3 border-l border-border/50 pl-4">
+                  {repliesOf(c.id).map((r) => (
+                    <li key={r.id}>
+                      <p className="text-sm font-medium">
+                        {r.authorName}
+                        {r.authorType === "staff" && (
+                          <span className="ml-2 rounded bg-primary/10 px-1.5 py-0.5 text-[10px] uppercase text-primary">
+                            Equipe
+                          </span>
+                        )}
+                      </p>
+                      <p className="mt-1 text-sm text-muted-foreground whitespace-pre-wrap">{r.text}</p>
+                      {user?.id === r.authorId && (
+                        <button
+                          type="button"
+                          className="mt-1 inline-flex items-center gap-1 text-xs text-destructive hover:underline"
+                          onClick={() => del.mutate(r.id)}
+                        >
+                          <Trash2 className="h-3 w-3" /> Excluir
+                        </button>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+    </Card>
   );
 }
 
@@ -445,13 +731,13 @@ function CourseAiAssistant({ course, lesson }: { course: Course; lesson: Lesson 
   const suggestions = [
     `Resuma a aula "${lesson.title}"`,
     `Quais pontos principais de ${course.title}?`,
-    "Explique o conteÃºdo de forma simples",
-    "O que revisar antes da prÃ³xima atividade?",
+    "Explique o conteúdo de forma simples",
+    "O que revisar antes da próxima atividade?",
   ];
 
   const ensureConv = async () => {
     if (convId) return convId;
-    const c = await aiService.createConversation(`${course.title} â€” ${lesson.title}`, {
+    const c = await aiService.createConversation(`${course.title} — ${lesson.title}`, {
       courseId: course.id,
       lessonId: lesson.id,
     });
@@ -473,7 +759,7 @@ function CourseAiAssistant({ course, lesson }: { course: Course; lesson: Lesson 
       });
       setMessages((m) => [...m, { role: "assistant", content: reply.content }]);
     } catch {
-      toast.error("Assistente indisponÃ­vel no momento.");
+      toast.error("Assistente indisponível no momento.");
       setMessages((m) => m.slice(0, -1));
     } finally {
       setBusy(false);
@@ -483,9 +769,9 @@ function CourseAiAssistant({ course, lesson }: { course: Course; lesson: Lesson 
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
       <div className="space-y-2 border-b border-border/60 p-4">
-        <h3 className="font-display text-lg font-semibold">DÃºvidas sobre este curso?</h3>
+        <h3 className="font-display text-lg font-semibold">Dúvidas sobre este curso?</h3>
         <p className="text-xs text-muted-foreground">
-          O assistente pode cometer erros. Confira as informaÃ§Ãµes. Sujeito Ã  configuraÃ§Ã£o de IA da escola.
+          O assistente pode cometer erros. Confira as informações. Sujeito à configuração de IA da escola.
         </p>
       </div>
       <div className="flex-1 space-y-3 overflow-y-auto p-4">

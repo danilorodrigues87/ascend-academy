@@ -11,7 +11,7 @@ import { authService } from "@/services/authService";
 export const Route = createFileRoute("/forgot-password")({
   component: ForgotPage,
   head: () => ({
-    meta: [{ title: "Recuperar senha — Aurora" }],
+    meta: [{ title: "Recuperar senha — CTI Educacional" }],
   }),
 });
 

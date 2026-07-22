@@ -19,7 +19,7 @@ import {
 
 export const Route = createFileRoute("/_app/roleplay")({
   component: RolePlayListPage,
-  head: () => ({ meta: [{ title: "Simulações Práticas — Aurora" }] }),
+  head: () => ({ meta: [{ title: "Simulações Práticas — CTI Educacional" }] }),
 });
 
 const difficultyLabel: Record<RolePlayDifficulty, string> = {

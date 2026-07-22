@@ -43,19 +43,6 @@ export const authService = {
     return session;
   },
 
-  async firstAccess(payload: { email: string; password: string; token: string }): Promise<AuthSession> {
-    if (!payload.token) throw new Error("Token de primeiro acesso inválido.");
-    if (USE_API) {
-      const data = await http.post<{ user: User; tokens: AuthTokens }>("/auth/first-access", payload, {
-        token: null,
-      });
-      const session: AuthSession = { user: data.user, tokens: data.tokens };
-      persist(session);
-      return session;
-    }
-    return this.login({ email: payload.email, password: payload.password });
-  },
-
   async forgotPassword(email: string): Promise<{ ok: true }> {
     if (!email) throw new Error("Informe seu email.");
     if (USE_API) {
@@ -63,6 +50,20 @@ export const authService = {
     }
     await delay(500);
     return { ok: true };
+  },
+
+  async resetPassword(token: string, password: string): Promise<{ ok: true; message?: string }> {
+    if (!token) throw new Error("Link inválido.");
+    if (!password || password.length < 8) throw new Error("A senha deve ter pelo menos 8 caracteres.");
+    if (USE_API) {
+      return http.post<{ ok: true; message?: string }>(
+        "/auth/reset-password",
+        { token, password },
+        { token: null },
+      );
+    }
+    await delay(500);
+    return { ok: true, message: "Senha atualizada." };
   },
 
   async logout(): Promise<void> {
@@ -78,5 +79,55 @@ export const authService = {
     } catch {
       return null;
     }
+  },
+
+  /** Atualiza o user na sessão (XP, avatar, cidade…) via GET /me. */
+  async refreshUser(): Promise<User | null> {
+    const session = this.getSession();
+    if (!session) return null;
+    if (!USE_API) return session.user;
+    const user = await http.get<User>("/me");
+    persist({ ...session, user });
+    return user;
+  },
+
+  patchUser(partial: Partial<User>): User | null {
+    const session = this.getSession();
+    if (!session) return null;
+    const user = { ...session.user, ...partial };
+    persist({ ...session, user });
+    return user;
+  },
+
+  async uploadAvatar(file: File): Promise<User> {
+    if (!USE_API) {
+      const url = URL.createObjectURL(file);
+      const user = this.patchUser({ avatarUrl: url });
+      if (!user) throw new Error("Sessão inválida.");
+      return user;
+    }
+    const fd = new FormData();
+    fd.append("foto", file);
+    const data = await http.postForm<{ ok: boolean; user: User; message?: string }>("/me/avatar", fd);
+    const session = this.getSession();
+    if (!session) throw new Error("Sessão inválida.");
+    persist({ ...session, user: data.user });
+    return data.user;
+  },
+
+  /** Altera senha do aluno logado. */
+  async changePassword(currentPassword: string, newPassword: string, confirmPassword: string): Promise<{ ok: true; message?: string }> {
+    if (!currentPassword) throw new Error("Informe a senha atual.");
+    if (!newPassword || newPassword.length < 8) throw new Error("A nova senha deve ter pelo menos 8 caracteres.");
+    if (newPassword !== confirmPassword) throw new Error("A confirmação da nova senha não confere.");
+    if (USE_API) {
+      return http.post<{ ok: true; message?: string }>("/me/password", {
+        currentPassword,
+        newPassword,
+        confirmPassword,
+      });
+    }
+    await delay(400);
+    return { ok: true, message: "Senha alterada com sucesso." };
   },
 };

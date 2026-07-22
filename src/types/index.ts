@@ -12,10 +12,10 @@ export interface User {
   role: "student" | "admin";
   xp: number;
   level: number;
+  nextLevelXp?: number;
   streakDays: number;
   totalStudyMinutes: number;
   createdAt: string;
-  firstAccess?: boolean;
 }
 
 export interface AuthTokens {
@@ -57,12 +57,41 @@ export interface Lesson {
   }[];
   completed: boolean;
   locked: boolean;
+  lockReason?: string | null;
+  lockMessage?: string | null;
   order: number;
   resources?: { id: string; label: string; url: string; type: "pdf" | "link" | "file" }[];
   needsRewatch?: boolean;
   unitScore?: number | null;
   unitPassed?: boolean;
   cycle?: number;
+}
+
+export interface LessonComment {
+  id: string;
+  parentId?: string | null;
+  authorId: string;
+  authorName: string;
+  authorType: "student" | "staff";
+  text: string;
+  createdAt: string;
+}
+
+export interface AccessWindow {
+  active: boolean;
+  window?: {
+    fonte?: string;
+    inicio?: string;
+    fim?: string;
+    aulas_cota?: number;
+    label?: string;
+  } | null;
+  quotaMax: number;
+  quotaUsed: number;
+  quotaRemaining: number;
+  consumedLessonIds?: string[];
+  nextWindow?: { data?: string; inicio?: string; fim?: string; label?: string; fonte?: string } | null;
+  message?: string;
 }
 
 export interface CurriculumItem {
@@ -73,6 +102,8 @@ export interface CurriculumItem {
   durationMinutes?: number;
   completed: boolean;
   locked: boolean;
+  lockReason?: string | null;
+  lockMessage?: string | null;
   needsRewatch?: boolean;
   unitScore?: number | null;
   unitPassed?: boolean;
@@ -105,6 +136,8 @@ export interface Course {
   estimatedMinutes: number;
   rating: number;
   ratingCount: number;
+  /** Nota do aluno logado (1–5), se já avaliou. */
+  myRating?: number | null;
   progressPercent: number;
   objectives: string[];
   modulesCount: number;
@@ -112,6 +145,9 @@ export interface Course {
   modules: Module[];
   enrolled: boolean;
   lastAccessedLessonId?: string;
+  accessWindow?: AccessWindow;
+  curriculumCount?: number;
+  curriculumCompleted?: number;
 }
 
 export interface Notification {
@@ -119,6 +155,7 @@ export interface Notification {
   title: string;
   message: string;
   type: "lesson" | "course" | "certificate" | "ai" | "system";
+  link?: string | null;
   createdAt: string;
   read: boolean;
 }
@@ -126,8 +163,12 @@ export interface Notification {
 export interface Achievement {
   id: string;
   title: string;
+  subtitle?: string;
   description: string;
+  howTo?: string;
   icon: string; // lucide icon name
+  rarity?: "bronze" | "prata" | "ouro" | "lendario";
+  badgeUrl?: string | null;
   unlockedAt?: string;
   progress?: number;
   goal?: number;
@@ -137,6 +178,7 @@ export interface RankingEntry {
   id: string;
   name: string;
   avatarUrl?: string;
+  city?: string | null;
   xp: number;
   level?: number;
   position: number;
@@ -147,9 +189,14 @@ export interface Certificate {
   id: string;
   courseId: string;
   courseTitle: string;
+  schoolName?: string;
   issuedAt: string;
   workloadHours: number;
-  pdfUrl?: string;
+  pdfUrl?: string | null;
+  code?: string;
+  /** valid = curso ainda 100%; outdated = escola editou e falta conteúdo */
+  status?: "valid" | "outdated";
+  progressPercent?: number;
 }
 
 export type AssessmentQuestionType = "multiple" | "boolean" | "essay" | "roleplay";
@@ -304,6 +351,9 @@ export interface RolePlaySimulation {
   status: RolePlayStatus;
   score?: number;
   evaluation?: RolePlayEvaluation;
+  xpEarned?: number;
+  needsRewatch?: boolean;
+  unitScore?: number;
 }
 
 export interface ChatMessage {

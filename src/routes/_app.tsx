@@ -6,6 +6,7 @@ import { Topbar } from "@/components/layout/Topbar";
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { notificationsService } from "@/services";
+import { filterNotificationsByPrefs, useNotificationPrefs } from "@/utils/notificationPrefs";
 
 export const Route = createFileRoute("/_app")({
   component: AppLayout,
@@ -15,6 +16,7 @@ function AppLayout() {
   const { isAuthenticated, loading } = useAuth();
   const navigate = useNavigate();
   const [clientReady, setClientReady] = useState(false);
+  const [prefs] = useNotificationPrefs();
 
   useEffect(() => {
     setClientReady(true);
@@ -31,9 +33,9 @@ function AppLayout() {
     queryFn: () => notificationsService.list(),
     enabled: clientReady && isAuthenticated,
   });
-  const unread = notifications.filter((n) => !n.read).length;
+  const visible = filterNotificationsByPrefs(notifications, prefs);
+  const unread = visible.filter((n) => !n.read).length;
 
-  // Evita mismatch SSR/cliente: no servidor e no 1º paint mostra spinner
   if (!clientReady || loading || !isAuthenticated) {
     return (
       <div className="grid min-h-screen place-items-center bg-background">
