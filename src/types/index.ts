@@ -160,6 +160,25 @@ export interface Notification {
   read: boolean;
 }
 
+/** Extrato financeiro do aluno (só leitura no portal). */
+export interface StudentFinanceItem {
+  id: string;
+  origin: string;
+  description: string;
+  amount: number;
+  paidAmount: number;
+  dueDate: string | null;
+  paidAt: string | null;
+  status: "open" | "paid" | "overdue";
+  paymentType?: string | null;
+}
+
+export interface StudentFinanceSummary {
+  hasFinance: boolean;
+  totals: { paid: number; open: number; overdue: number };
+  items: StudentFinanceItem[];
+}
+
 export interface Achievement {
   id: string;
   title: string;

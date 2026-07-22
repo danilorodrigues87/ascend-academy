@@ -9,6 +9,7 @@ import {
   LogOut,
   Trophy,
   Medal,
+  Wallet,
 } from "lucide-react";
 import {
   Sidebar,
@@ -28,6 +29,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { initials } from "@/utils/format";
 import { useNavigate } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { financeService } from "@/services";
 
 const nav = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
@@ -47,8 +50,19 @@ export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const pathname = useRouterState({ select: (r) => r.location.pathname });
-  const { user, logout } = useAuth();
+  const { user, logout, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+
+  const { data: finance } = useQuery({
+    queryKey: ["finance"],
+    queryFn: () => financeService.summary(),
+    enabled: !!isAuthenticated,
+    staleTime: 60_000,
+  });
+
+  const navItems = finance?.hasFinance
+    ? [...nav, { title: "Financeiro", url: "/finance", icon: Wallet }]
+    : nav;
 
   const isActive = (url: string) => pathname === url || pathname.startsWith(url + "/");
 
@@ -63,7 +77,7 @@ export function AppSidebar() {
           <SidebarGroupLabel>Aprendizado</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {nav.map((item) => (
+              {navItems.map((item) => (
                 <SidebarMenuItem key={item.url}>
                   <SidebarMenuButton asChild isActive={isActive(item.url)} tooltip={item.title}>
                     <Link to={item.url} className="flex items-center gap-3">

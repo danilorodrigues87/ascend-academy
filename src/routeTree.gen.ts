@@ -21,6 +21,7 @@ import { Route as AppCertificatesRouteImport } from './routes/_app.certificates'
 import { Route as AppContinueRouteImport } from './routes/_app.continue'
 import { Route as AppCoursesRouteImport } from './routes/_app.courses'
 import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
+import { Route as AppFinanceRouteImport } from './routes/_app.finance'
 import { Route as AppNotificationsRouteImport } from './routes/_app.notifications'
 import { Route as AppProfileRouteImport } from './routes/_app.profile'
 import { Route as AppRankingRouteImport } from './routes/_app.ranking'
@@ -91,6 +92,11 @@ const AppDashboardRoute = AppDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AppRoute,
 } as any)
+const AppFinanceRoute = AppFinanceRouteImport.update({
+  id: '/finance',
+  path: '/finance',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppNotificationsRoute = AppNotificationsRouteImport.update({
   id: '/notifications',
   path: '/notifications',
@@ -155,6 +161,7 @@ export interface FileRoutesByFullPath {
   '/continue': typeof AppContinueRoute
   '/courses': typeof AppCoursesRouteWithChildren
   '/dashboard': typeof AppDashboardRoute
+  '/finance': typeof AppFinanceRoute
   '/notifications': typeof AppNotificationsRoute
   '/profile': typeof AppProfileRoute
   '/ranking': typeof AppRankingRoute
@@ -177,6 +184,7 @@ export interface FileRoutesByTo {
   '/certificates': typeof AppCertificatesRoute
   '/continue': typeof AppContinueRoute
   '/dashboard': typeof AppDashboardRoute
+  '/finance': typeof AppFinanceRoute
   '/notifications': typeof AppNotificationsRoute
   '/profile': typeof AppProfileRoute
   '/ranking': typeof AppRankingRoute
@@ -201,6 +209,7 @@ export interface FileRoutesById {
   '/_app/continue': typeof AppContinueRoute
   '/_app/courses': typeof AppCoursesRouteWithChildren
   '/_app/dashboard': typeof AppDashboardRoute
+  '/_app/finance': typeof AppFinanceRoute
   '/_app/notifications': typeof AppNotificationsRoute
   '/_app/profile': typeof AppProfileRoute
   '/_app/ranking': typeof AppRankingRoute
@@ -226,6 +235,7 @@ export interface FileRouteTypes {
     | '/continue'
     | '/courses'
     | '/dashboard'
+    | '/finance'
     | '/notifications'
     | '/profile'
     | '/ranking'
@@ -248,6 +258,7 @@ export interface FileRouteTypes {
     | '/certificates'
     | '/continue'
     | '/dashboard'
+    | '/finance'
     | '/notifications'
     | '/profile'
     | '/ranking'
@@ -271,6 +282,7 @@ export interface FileRouteTypes {
     | '/_app/continue'
     | '/_app/courses'
     | '/_app/dashboard'
+    | '/_app/finance'
     | '/_app/notifications'
     | '/_app/profile'
     | '/_app/ranking'
@@ -375,6 +387,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AppDashboardRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/finance': {
+      id: '/_app/finance'
+      path: '/finance'
+      fullPath: '/finance'
+      preLoaderRoute: typeof AppFinanceRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/notifications': {
@@ -498,6 +517,7 @@ interface AppRouteChildren {
   AppContinueRoute: typeof AppContinueRoute
   AppCoursesRoute: typeof AppCoursesRouteWithChildren
   AppDashboardRoute: typeof AppDashboardRoute
+  AppFinanceRoute: typeof AppFinanceRoute
   AppNotificationsRoute: typeof AppNotificationsRoute
   AppProfileRoute: typeof AppProfileRoute
   AppRankingRoute: typeof AppRankingRoute
@@ -513,6 +533,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppContinueRoute: AppContinueRoute,
   AppCoursesRoute: AppCoursesRouteWithChildren,
   AppDashboardRoute: AppDashboardRoute,
+  AppFinanceRoute: AppFinanceRoute,
   AppNotificationsRoute: AppNotificationsRoute,
   AppProfileRoute: AppProfileRoute,
   AppRankingRoute: AppRankingRoute,
